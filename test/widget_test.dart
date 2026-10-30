@@ -11,6 +11,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:devices_and_printers/main.dart';
 
 void main() {
+  testWidgets('uses the system theme mode', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+
+    expect(materialApp.themeMode, ThemeMode.system);
+    expect(materialApp.theme, isNotNull);
+    expect(materialApp.darkTheme, isNotNull);
+  });
+
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
