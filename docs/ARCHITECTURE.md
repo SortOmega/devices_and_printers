@@ -73,11 +73,18 @@ visual treatment. An explicit widget style always takes precedence over the
 inherited theme.
 
 Device discovery must represent user-relevant devices rather than exposing
-every low-level USB entry. USB is a transport detail; classify meaningful
-devices such as monitors, keyboards, mice, headsets, phones, cameras, and
-storage devices by their system identity, and omit generic hubs or anonymous
-USB records. System-known printers and Bluetooth devices may remain visible
-when disconnected so users can distinguish saved devices from active devices.
+every low-level USB entry. USB is a transport detail; classify meaningful devices such as monitors,
+keyboards, mice, headsets, phones, cameras, storage devices, printers, and
+plotters by their system identity. Records that cannot be classified must
+remain visible as `unknown` rather than being silently dropped, so a connected
+device without a driver can still be identified and added later. USB hubs,
+root hubs, and host-controller entries are transport infrastructure rather
+than connected peripherals and must be excluded. Built-in Bluetooth adapters,
+radios, and controllers, such as Intel AX201 Bluetooth, are also system
+infrastructure and must be excluded. Only remote Bluetooth peripherals belong
+in the device list. System-known printers and Bluetooth devices may remain
+visible when disconnected so users can distinguish saved devices from active
+devices.
 
 ## Feature Structure
 
