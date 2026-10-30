@@ -28,6 +28,8 @@ The first implementation queries the Linux system and displays:
   configured, with their device identity marked as active or unknown.
 - Refresh through the toolbar or pull-to-refresh gesture.
 - Light and dark themes that follow the operating-system preference.
+- Single-instance behavior: launching the application again exits without
+  creating a second window or application process.
 
 The Linux commands are treated as system integrations. If an optional command
 is unavailable, the application continues displaying devices returned by the
@@ -57,3 +59,5 @@ flutter build linux
 
 The application requires a Linux desktop environment and uses the native
 window-manager decorations provided by GTK and the desktop environment.
+The Linux runner registers a unique application ID so only one instance can
+remain active at a time.

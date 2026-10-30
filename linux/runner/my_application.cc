@@ -69,6 +69,13 @@ static gboolean my_application_local_command_line(GApplication* application,
     return TRUE;
   }
 
+  // A second invocation is handled by the existing application instance.
+  // Do not activate or create another Flutter window.
+  if (g_application_get_is_remote(application)) {
+    *exit_status = 0;
+    return TRUE;
+  }
+
   g_application_activate(application);
   *exit_status = 0;
 
@@ -120,5 +127,5 @@ MyApplication* my_application_new() {
 
   return MY_APPLICATION(g_object_new(my_application_get_type(),
                                      "application-id", APPLICATION_ID, "flags",
-                                     G_APPLICATION_NON_UNIQUE, nullptr));
+                                     G_APPLICATION_DEFAULT_FLAGS, nullptr));
 }
