@@ -26,7 +26,7 @@ static void my_application_activate(GApplication* application) {
   // window manager and its GTK integration provide the native decorations
   // for GNOME, KDE Plasma, and other Linux desktop environments.
   gtk_window_set_decorated(window, TRUE);
-  gtk_window_set_title(window, "devices_and_printers");
+  gtk_window_set_title(window, "Devices and Printers Manager");
 
   gtk_window_set_default_size(window, 1280, 720);
 
