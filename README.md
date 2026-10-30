@@ -1,17 +1,49 @@
-# devices_and_printers
+# Devices and Printers
 
-A new Flutter project.
+Devices and Printers is a Flutter desktop application for Linux that
+centralizes the discovery and management of interactive peripherals connected
+to a computer. It is inspired by the Windows Control Panel experience and aims
+to make devices and printers easy to find, classify, inspect, and configure
+from one place.
 
-## Getting Started
+## Current Features
 
-This project is a starting point for a Flutter application.
+The first implementation queries the Linux system and displays:
 
-A few resources to get you started if this is your first Flutter project:
+- CUPS printers reported by `lpstat`.
+- USB devices reported by `lsusb`.
+- Paired or discovered Bluetooth devices reported by `bluetoothctl`.
+- Device categories for printers, USB devices, and Bluetooth devices.
+- Connection information such as USB, Bluetooth, network, local, or unknown.
+- Recognition status for devices returned by the system.
+- Refresh through the toolbar or pull-to-refresh gesture.
+- Light and dark themes that follow the operating-system preference.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The Linux commands are treated as system integrations. If an optional command
+is unavailable, the application continues displaying devices returned by the
+other available integrations.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Project Direction
+
+Planned capabilities include adding devices and printers, editing device
+settings, opening system configuration tools, managing printer queues,
+tracking availability, and distinguishing recognized devices from devices
+added by the user.
+
+The project follows MVVM and feature-oriented architecture. See:
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Internationalization](docs/I18N.md)
+- [Testing](docs/TESTS.md)
+
+## Development
+
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter build linux
+```
+
+The application requires a Linux desktop environment and uses the native
+window-manager decorations provided by GTK and the desktop environment.
