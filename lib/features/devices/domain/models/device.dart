@@ -1,5 +1,6 @@
 enum DeviceType {
   printer,
+  plotter,
   monitor,
   headset,
   mouse,
@@ -7,6 +8,7 @@ enum DeviceType {
   phone,
   camera,
   storage,
+  unknown,
   bluetooth,
 }
 

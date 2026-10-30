@@ -31,7 +31,8 @@ void main() {
         'lsusb': const CommandResult(
           stdout:
               'Bus 001 Device 002: ID 1234:5678 Example Keyboard\n'
-              'Bus 001 Device 003: ID 2345:6789 Generic USB Hub\n',
+              'Bus 001 Device 003: ID 2345:6789 Generic USB Hub\n'
+              'Bus 001 Device 004: ID 1d6b:0002 Linux Foundation 2.0 root hub\n',
           stderr: '',
           exitCode: 0,
         ),
@@ -57,5 +58,35 @@ void main() {
     expect(devices[1].status, DeviceStatus.active);
     expect(devices[2].type, DeviceType.headset);
     expect(devices[2].status, DeviceStatus.disconnected);
+  });
+
+  test('recognizes a USB plotter without a configured driver', () async {
+    final repository = SystemDeviceRepository(
+      commandRunner: FakeCommandRunner({
+        'lpstat': const CommandResult(stdout: '', stderr: '', exitCode: 0),
+        'lsusb': const CommandResult(
+          stdout: 'Bus 001 Device 004: ID 1234:5678 Large Format Plotter\n',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'bluetoothctl devices': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'bluetoothctl devices Connected': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+      }),
+    );
+
+    final devices = await repository.getDevices();
+
+    expect(devices, hasLength(1));
+    expect(devices.single.type, DeviceType.plotter);
+    expect(devices.single.status, DeviceStatus.active);
+    expect(devices.single.connection, DeviceConnection.usb);
   });
 }

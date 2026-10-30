@@ -77,10 +77,10 @@ class SystemDeviceRepository implements DeviceRepository {
         RegExp(r'^Bus\s+\S+\s+Device\s+\S+:\s+ID\s+\S+\s+\S+\s+'),
         '',
       );
-      final type = _classifyDevice(name);
-      if (type == null) {
+      if (_isUsbInfrastructure(name)) {
         continue;
       }
+      final type = _classifyDevice(name) ?? DeviceType.unknown;
       devices.add(
         Device(
           id: 'usb:${trimmed.hashCode}',
@@ -93,6 +93,20 @@ class SystemDeviceRepository implements DeviceRepository {
       );
     }
     return devices;
+  }
+
+  bool _isUsbInfrastructure(String name) {
+    final normalizedName = name.toLowerCase();
+    return _containsAny(normalizedName, [
+      'hub',
+      'root hub',
+      'host controller',
+      'linux foundation',
+      'xhci',
+      'ehci',
+      'ohci',
+      'uhci',
+    ]);
   }
 
   List<Device> _parseBluetoothDevices(String output, String connectedOutput) {
@@ -125,6 +139,12 @@ class SystemDeviceRepository implements DeviceRepository {
 
   DeviceType? _classifyDevice(String name) {
     final normalizedName = name.toLowerCase();
+    if (_containsAny(normalizedName, ['plotter', 'plot'])) {
+      return DeviceType.plotter;
+    }
+    if (_containsAny(normalizedName, ['printer', 'print'])) {
+      return DeviceType.printer;
+    }
     if (_containsAny(normalizedName, ['monitor', 'display', 'screen'])) {
       return DeviceType.monitor;
     }

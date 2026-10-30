@@ -147,6 +147,7 @@ class _DeviceGroup extends StatelessWidget {
   String _labelFor(DeviceType type) {
     return switch (type) {
       DeviceType.printer => 'Printers',
+      DeviceType.plotter => 'Plotters',
       DeviceType.monitor => 'Monitors',
       DeviceType.headset => 'Headsets',
       DeviceType.mouse => 'Mice',
@@ -154,6 +155,7 @@ class _DeviceGroup extends StatelessWidget {
       DeviceType.phone => 'Phones',
       DeviceType.camera => 'Cameras',
       DeviceType.storage => 'Storage',
+      DeviceType.unknown => 'Unknown devices',
       DeviceType.bluetooth => 'Bluetooth devices',
     };
   }
@@ -264,6 +266,7 @@ class _DeviceCardState extends State<_DeviceCard> {
 IconData iconForDevice(Device device) {
   return switch (device.type) {
     DeviceType.printer => Icons.print,
+    DeviceType.plotter => Icons.print,
     DeviceType.monitor => Icons.monitor,
     DeviceType.headset => Icons.headset,
     DeviceType.mouse => Icons.mouse,
@@ -271,6 +274,7 @@ IconData iconForDevice(Device device) {
     DeviceType.phone => Icons.smartphone,
     DeviceType.camera => Icons.camera_alt,
     DeviceType.storage => Icons.storage,
+    DeviceType.unknown => Icons.device_unknown,
     DeviceType.bluetooth => Icons.bluetooth,
   };
 }
