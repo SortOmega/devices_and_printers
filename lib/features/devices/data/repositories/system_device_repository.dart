@@ -77,7 +77,7 @@ class SystemDeviceRepository implements DeviceRepository {
         RegExp(r'^Bus\s+\S+\s+Device\s+\S+:\s+ID\s+\S+\s+\S+\s+'),
         '',
       );
-      if (_isUsbInfrastructure(name)) {
+      if (_isUsbInfrastructure(name) || _isBluetoothController(name)) {
         continue;
       }
       final type = _classifyDevice(name) ?? DeviceType.unknown;
@@ -106,6 +106,22 @@ class SystemDeviceRepository implements DeviceRepository {
       'ehci',
       'ohci',
       'uhci',
+    ]);
+  }
+
+  bool _isBluetoothController(String name) {
+    final normalizedName = name.toLowerCase();
+    return _containsAny(normalizedName, [
+      'bluetooth adapter',
+      'bluetooth controller',
+      'bluetooth radio',
+      'wireless bluetooth',
+      'ax201 bluetooth',
+      'intel bluetooth',
+      'realtek bluetooth',
+      'broadcom bluetooth',
+      'mediatek bluetooth',
+      'qualcomm bluetooth',
     ]);
   }
 
