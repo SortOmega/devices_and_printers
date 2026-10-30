@@ -1,8 +1,18 @@
-enum DeviceType { printer, usb, bluetooth }
+enum DeviceType {
+  printer,
+  monitor,
+  headset,
+  mouse,
+  keyboard,
+  phone,
+  camera,
+  storage,
+  bluetooth,
+}
 
 enum DeviceConnection { usb, bluetooth, network, local, unknown }
 
-enum DeviceStatus { recognized, unavailable }
+enum DeviceStatus { active, inactive, disconnected }
 
 class Device {
   const Device({
@@ -22,4 +32,6 @@ class Device {
   final String? details;
 
   bool get isPrinter => type == DeviceType.printer;
+
+  bool get isActive => status == DeviceStatus.active;
 }

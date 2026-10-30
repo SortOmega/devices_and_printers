@@ -14,12 +14,13 @@ class SystemDeviceRepository implements DeviceRepository {
       _commandRunner.run('lpstat', ['-p', '-v']),
       _commandRunner.run('lsusb', const []),
       _commandRunner.run('bluetoothctl', ['devices']),
+      _commandRunner.run('bluetoothctl', ['devices', 'Connected']),
     ]);
 
     return [
       ..._parsePrinters(results[0].stdout),
       ..._parseUsbDevices(results[1].stdout),
-      ..._parseBluetoothDevices(results[2].stdout),
+      ..._parseBluetoothDevices(results[2].stdout, results[3].stdout),
     ];
   }
 
@@ -56,8 +57,8 @@ class SystemDeviceRepository implements DeviceRepository {
           type: DeviceType.printer,
           connection: _printerConnection(uri),
           status: description.contains('disabled')
-              ? DeviceStatus.unavailable
-              : DeviceStatus.recognized,
+              ? DeviceStatus.inactive
+              : DeviceStatus.active,
           details: uri ?? description,
         ),
       );
@@ -76,13 +77,17 @@ class SystemDeviceRepository implements DeviceRepository {
         RegExp(r'^Bus\s+\S+\s+Device\s+\S+:\s+ID\s+\S+\s+\S+\s+'),
         '',
       );
+      final type = _classifyDevice(name);
+      if (type == null) {
+        continue;
+      }
       devices.add(
         Device(
           id: 'usb:${trimmed.hashCode}',
           name: name,
-          type: DeviceType.usb,
+          type: type,
           connection: DeviceConnection.usb,
-          status: DeviceStatus.recognized,
+          status: DeviceStatus.active,
           details: trimmed,
         ),
       );
@@ -90,7 +95,13 @@ class SystemDeviceRepository implements DeviceRepository {
     return devices;
   }
 
-  List<Device> _parseBluetoothDevices(String output) {
+  List<Device> _parseBluetoothDevices(String output, String connectedOutput) {
+    final connectedIds = connectedOutput
+        .split('\n')
+        .where((line) => line.trim().startsWith('Device '))
+        .map((line) => line.trim().split(RegExp(r'\s+'))[1])
+        .toSet();
+
     return output
         .split('\n')
         .where((line) => line.trim().startsWith('Device '))
@@ -101,13 +112,50 @@ class SystemDeviceRepository implements DeviceRepository {
           return Device(
             id: 'bluetooth:$id',
             name: name,
-            type: DeviceType.bluetooth,
+            type: _classifyDevice(name) ?? DeviceType.bluetooth,
             connection: DeviceConnection.bluetooth,
-            status: DeviceStatus.recognized,
+            status: connectedIds.contains(id)
+                ? DeviceStatus.active
+                : DeviceStatus.disconnected,
             details: id,
           );
         })
         .toList();
+  }
+
+  DeviceType? _classifyDevice(String name) {
+    final normalizedName = name.toLowerCase();
+    if (_containsAny(normalizedName, ['monitor', 'display', 'screen'])) {
+      return DeviceType.monitor;
+    }
+    if (_containsAny(normalizedName, [
+      'headset',
+      'headphone',
+      'earbud',
+      'auricular',
+    ])) {
+      return DeviceType.headset;
+    }
+    if (_containsAny(normalizedName, ['mouse', 'raton', 'ratón'])) {
+      return DeviceType.mouse;
+    }
+    if (_containsAny(normalizedName, ['keyboard', 'teclado'])) {
+      return DeviceType.keyboard;
+    }
+    if (_containsAny(normalizedName, ['camera', 'webcam'])) {
+      return DeviceType.camera;
+    }
+    if (_containsAny(normalizedName, ['phone', 'mobile', 'galaxy', 'iphone'])) {
+      return DeviceType.phone;
+    }
+    if (_containsAny(normalizedName, ['drive', 'storage', 'disk'])) {
+      return DeviceType.storage;
+    }
+    return null;
+  }
+
+  bool _containsAny(String value, List<String> candidates) {
+    return candidates.any(value.contains);
   }
 
   DeviceConnection _printerConnection(String? uri) {

@@ -22,14 +22,14 @@ void main() {
           name: 'Office printer',
           type: DeviceType.printer,
           connection: DeviceConnection.network,
-          status: DeviceStatus.recognized,
+          status: DeviceStatus.active,
         ),
         const Device(
           id: 'usb:one',
           name: 'Keyboard',
-          type: DeviceType.usb,
+          type: DeviceType.keyboard,
           connection: DeviceConnection.usb,
-          status: DeviceStatus.recognized,
+          status: DeviceStatus.active,
         ),
       ]),
     );
@@ -38,6 +38,6 @@ void main() {
 
     expect(viewModel.status, DeviceListStatus.loaded);
     expect(viewModel.groupedDevices[DeviceType.printer], hasLength(1));
-    expect(viewModel.groupedDevices[DeviceType.usb], hasLength(1));
+    expect(viewModel.groupedDevices[DeviceType.keyboard], hasLength(1));
   });
 }
