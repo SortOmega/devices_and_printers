@@ -65,6 +65,13 @@ core/
 Only add a shared utility when it is genuinely cross-feature. Feature-specific
 code belongs inside its feature directory.
 
+The global theme must use `ThemeMode.system` so the application follows the
+operating system's light or dark preference. Keep shared colors, typography,
+hover states, focus states, and surface defaults in `ThemeData`; do not set
+widget colors directly unless that element intentionally requires a specific
+visual treatment. An explicit widget style always takes precedence over the
+inherited theme.
+
 ## Feature Structure
 
 Use a structure like this for feature work:
