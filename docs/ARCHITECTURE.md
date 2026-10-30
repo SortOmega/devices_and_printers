@@ -72,6 +72,13 @@ widget colors directly unless that element intentionally requires a specific
 visual treatment. An explicit widget style always takes precedence over the
 inherited theme.
 
+Device discovery must represent user-relevant devices rather than exposing
+every low-level USB entry. USB is a transport detail; classify meaningful
+devices such as monitors, keyboards, mice, headsets, phones, cameras, and
+storage devices by their system identity, and omit generic hubs or anonymous
+USB records. System-known printers and Bluetooth devices may remain visible
+when disconnected so users can distinguish saved devices from active devices.
+
 ## Feature Structure
 
 Use a structure like this for feature work:

@@ -11,11 +11,17 @@ from one place.
 The first implementation queries the Linux system and displays:
 
 - CUPS printers reported by `lpstat`.
-- USB devices reported by `lsusb`.
-- Paired or discovered Bluetooth devices reported by `bluetoothctl`.
-- Device categories for printers, USB devices, and Bluetooth devices.
+- Meaningful USB-connected devices reported by `lsusb`, classified as
+  monitors, keyboards, mice, headsets, phones, cameras, storage, or other
+  supported device categories. Generic USB hubs and low-level entries are
+  omitted.
+- Known Bluetooth devices reported by `bluetoothctl`, including devices that
+  are currently disconnected.
+- System-configured printers and devices known to the operating system.
+- Device categories based on the actual device instead of the transport
+  protocol.
 - Connection information such as USB, Bluetooth, network, local, or unknown.
-- Recognition status for devices returned by the system.
+- Operational status: active, inactive, or disconnected.
 - Refresh through the toolbar or pull-to-refresh gesture.
 - Light and dark themes that follow the operating-system preference.
 
