@@ -117,4 +117,40 @@ void main() {
     expect(devices.single.status, DeviceStatus.active);
     expect(devices.single.connection, DeviceConnection.usb);
   });
+
+  test('uses the configured CUPS printer for its USB identity', () async {
+    final repository = SystemDeviceRepository(
+      commandRunner: FakeCommandRunner({
+        'lpstat': const CommandResult(
+          stdout:
+              'printer PLOTTER-GCC-AR24 is idle. enabled since today\n'
+              'device for PLOTTER-GCC-AR24: usb://GCC/AR-24?serial=0.0\n',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'lsusb': const CommandResult(
+          stdout: 'Bus 003 Device 005: ID 0f0b:801a GCC AR-24\n',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'bluetoothctl devices': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'bluetoothctl devices Connected': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+      }),
+    );
+
+    final devices = await repository.getDevices();
+
+    expect(devices, hasLength(1));
+    expect(devices.single.name, 'PLOTTER-GCC-AR24');
+    expect(devices.single.type, DeviceType.plotter);
+    expect(devices.single.connection, DeviceConnection.usb);
+  });
 }

@@ -17,9 +17,10 @@ class SystemDeviceRepository implements DeviceRepository {
       _commandRunner.run('bluetoothctl', ['devices', 'Connected']),
     ]);
 
+    final printers = _parsePrinters(results[0].stdout);
     return [
-      ..._parsePrinters(results[0].stdout),
-      ..._parseUsbDevices(results[1].stdout),
+      ...printers,
+      ..._parseUsbDevices(results[1].stdout, printers),
       ..._parseBluetoothDevices(results[2].stdout, results[3].stdout),
     ];
   }
@@ -54,7 +55,9 @@ class SystemDeviceRepository implements DeviceRepository {
         Device(
           id: 'printer:$name',
           name: name,
-          type: DeviceType.printer,
+          type: name.toLowerCase().contains('plot')
+              ? DeviceType.plotter
+              : DeviceType.printer,
           connection: _printerConnection(uri),
           status: description.contains('disabled')
               ? DeviceStatus.inactive
@@ -66,7 +69,7 @@ class SystemDeviceRepository implements DeviceRepository {
     return devices;
   }
 
-  List<Device> _parseUsbDevices(String output) {
+  List<Device> _parseUsbDevices(String output, List<Device> printers) {
     final devices = <Device>[];
     for (final line in output.split('\n')) {
       final trimmed = line.trim();
@@ -80,7 +83,14 @@ class SystemDeviceRepository implements DeviceRepository {
       if (_isUsbInfrastructure(name) || _isBluetoothController(name)) {
         continue;
       }
-      final type = _classifyDevice(name) ?? DeviceType.unknown;
+      final type =
+          _classifyDevice(name) ??
+          _configuredUsbPrinterType(name, printers) ??
+          DeviceType.unknown;
+      if (type != DeviceType.unknown &&
+          _configuredUsbPrinterType(name, printers) != null) {
+        continue;
+      }
       devices.add(
         Device(
           id: 'usb:${trimmed.hashCode}',
@@ -93,6 +103,27 @@ class SystemDeviceRepository implements DeviceRepository {
       );
     }
     return devices;
+  }
+
+  DeviceType? _configuredUsbPrinterType(String usbName, List<Device> printers) {
+    final normalizedUsbName = usbName.toLowerCase();
+    for (final printer in printers) {
+      if (printer.connection != DeviceConnection.usb ||
+          printer.details == null) {
+        continue;
+      }
+      final uriTokens = printer.details!
+          .replaceFirst(RegExp(r'^usb://'), '')
+          .split(RegExp(r'[/?:=&\s]+'))
+          .where((token) => token.length >= 3)
+          .map((token) => token.toLowerCase());
+      if (uriTokens.any(normalizedUsbName.contains)) {
+        return printer.name.toLowerCase().contains('plot')
+            ? DeviceType.plotter
+            : DeviceType.printer;
+      }
+    }
+    return null;
   }
 
   bool _isUsbInfrastructure(String name) {
