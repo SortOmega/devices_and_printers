@@ -55,11 +55,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final card = find.byType(AnimatedContainer).first;
+    final card = find.byKey(const ValueKey('monitor:monitor'));
     AnimatedContainer container = tester.widget(card);
     final initialDecoration = container.decoration! as BoxDecoration;
     expect(initialDecoration.border!.top.color, Colors.transparent);
 
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Office Monitor'));
     await tester.pumpAndSettle();
 
@@ -79,14 +81,19 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Office Monitor'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Office Keyboard'));
     await tester.pumpAndSettle();
 
-    final cards = tester.widgetList<AnimatedContainer>(
-      find.byType(AnimatedContainer),
-    );
+    final cards = <AnimatedContainer>[
+      tester.widget(find.byKey(const ValueKey('monitor:monitor'))),
+      tester.widget(find.byKey(const ValueKey('keyboard:keyboard'))),
+    ];
     final selectedCards = cards.where((card) {
       final decoration = card.decoration! as BoxDecoration;
       return decoration.color != Colors.transparent &&
@@ -94,5 +101,69 @@ void main() {
     });
 
     expect(selectedCards, hasLength(1));
+  });
+
+  testWidgets('switches between the devices and about pages', (
+    WidgetTester tester,
+  ) async {
+    final viewModel = DeviceListViewModel(FakeDeviceRepository())
+      ..loadDevices();
+
+    await tester.pumpWidget(
+      MaterialApp(home: DeviceListScreen(viewModel: viewModel)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('View Devices'), findsOneWidget);
+    expect(find.text('Add Device'), findsOneWidget);
+    expect(
+      find.text(
+        'A centralized Linux view for discovering and managing '
+        'connected devices and printers.',
+      ),
+      findsNothing,
+    );
+
+    await tester.tap(find.text('About'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'A centralized Linux view for discovering and managing '
+        'connected devices and printers.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Add Device'), findsNothing);
+
+    await tester.tap(find.text('View Devices'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Add Printer'), findsOneWidget);
+  });
+
+  testWidgets('provides device sorting and grouping controls', (
+    WidgetTester tester,
+  ) async {
+    final viewModel = DeviceListViewModel(FakeDeviceRepository())
+      ..loadDevices();
+
+    await tester.pumpWidget(
+      MaterialApp(home: DeviceListScreen(viewModel: viewModel)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sort: Name'), findsOneWidget);
+    expect(find.text('Group: Type'), findsOneWidget);
+
+    await tester.tap(find.text('Sort: Name'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sort: Status'), findsOneWidget);
+    await tester.tap(find.text('Sort: Status'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Group: Type'));
+    await tester.pumpAndSettle();
+    expect(find.text('Group: Status'), findsOneWidget);
   });
 }

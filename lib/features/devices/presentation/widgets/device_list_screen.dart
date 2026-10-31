@@ -16,6 +16,9 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   // Keep the set-based representation so multi-selection can be enabled later.
   final Set<String> _selectedDeviceIds = <String>{};
   static const bool _allowMultipleSelection = false;
+  String _activePage = 'devices';
+  String _sortOption = 'name';
+  String _groupOption = 'type';
 
   void _toggleSelection(String deviceId) {
     setState(() {
@@ -30,25 +33,173 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
     });
   }
 
+  List<MapEntry<String, List<Device>>> _deviceGroups() {
+    final devices = [...widget.viewModel.devices]
+      ..sort((first, second) {
+        return switch (_sortOption) {
+          'status' => statusLabel(
+            first.status,
+          ).compareTo(statusLabel(second.status)),
+          'connection' => connectionLabel(
+            first.connection,
+          ).compareTo(connectionLabel(second.connection)),
+          _ => first.name.toLowerCase().compareTo(second.name.toLowerCase()),
+        };
+      });
+    final groups = <String, List<Device>>{};
+    for (final device in devices) {
+      final key = switch (_groupOption) {
+        'status' => statusLabel(device.status),
+        'connection' => connectionLabel(device.connection),
+        _ => _labelForType(device.type),
+      };
+      groups.putIfAbsent(key, () => []).add(device);
+    }
+    return groups.entries.toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: widget.viewModel,
       builder: (context, _) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Devices and Printers'),
-            actions: [
-              IconButton(
-                onPressed: widget.viewModel.loadDevices,
-                tooltip: 'Refresh devices',
-                icon: const Icon(Icons.refresh),
+          body: Column(
+            children: [
+              _buildPrimaryHeader(context),
+              if (_activePage == 'devices') _buildDevicesHeader(context),
+              Expanded(
+                child: _activePage == 'devices'
+                    ? _buildBody(context)
+                    : const _AboutPage(),
               ),
             ],
           ),
-          body: _buildBody(context),
         );
       },
+    );
+  }
+
+  Widget _buildPrimaryHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: theme.colorScheme.surface,
+      elevation: 1,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Wrap(
+            spacing: 24,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Icon(Icons.devices, color: theme.colorScheme.primary),
+              Text('Devices and Printers', style: theme.textTheme.titleLarge),
+              SegmentedButton<String>(
+                segments: const [
+                  ButtonSegment(
+                    value: 'devices',
+                    label: Text('View Devices'),
+                    icon: Icon(Icons.devices_other),
+                  ),
+                  ButtonSegment(
+                    value: 'about',
+                    label: Text('About'),
+                    icon: Icon(Icons.info_outline),
+                  ),
+                ],
+                selected: {_activePage},
+                onSelectionChanged: (selection) {
+                  setState(() => _activePage = selection.first);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDevicesHeader(BuildContext context) {
+    return Material(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            DropdownButton<String>(
+              value: _sortOption,
+              underline: const SizedBox.shrink(),
+              onChanged: (value) {
+                if (value != null) setState(() => _sortOption = value);
+              },
+              items: const [
+                DropdownMenuItem(value: 'name', child: Text('Sort: Name')),
+                DropdownMenuItem(value: 'status', child: Text('Sort: Status')),
+                DropdownMenuItem(
+                  value: 'connection',
+                  child: Text('Sort: Connection'),
+                ),
+              ],
+            ),
+            DropdownButton<String>(
+              value: _groupOption,
+              underline: const SizedBox.shrink(),
+              onChanged: (value) {
+                if (value != null) setState(() => _groupOption = value);
+              },
+              items: const [
+                DropdownMenuItem(value: 'type', child: Text('Group: Type')),
+                DropdownMenuItem(value: 'status', child: Text('Group: Status')),
+                DropdownMenuItem(
+                  value: 'connection',
+                  child: Text('Group: Connection'),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
+            FilledButton.icon(
+              onPressed: () => _showAddDialog(context, 'device'),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Device'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _showAddDialog(context, 'printer'),
+              icon: const Icon(Icons.print),
+              label: const Text('Add Printer'),
+            ),
+            IconButton(
+              onPressed: widget.viewModel.loadDevices,
+              tooltip: 'Refresh devices',
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showAddDialog(BuildContext context, String itemType) {
+    final title = itemType == 'printer' ? 'Add Printer' : 'Add Device';
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(
+          '$title will be available when system configuration integration '
+          'is added.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -87,9 +238,9 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          for (final entry in widget.viewModel.groupedDevices.entries)
+          for (final entry in _deviceGroups())
             _DeviceGroup(
-              type: entry.key,
+              title: entry.key,
               devices: entry.value,
               selectedDeviceIds: _selectedDeviceIds,
               onDeviceSelected: _toggleSelection,
@@ -100,15 +251,32 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   }
 }
 
+String _labelForType(DeviceType type) {
+  return switch (type) {
+    DeviceType.printer => 'Printers',
+    DeviceType.plotter => 'Plotters',
+    DeviceType.monitor => 'Monitors',
+    DeviceType.headset => 'Headsets',
+    DeviceType.microphone => 'Microphones',
+    DeviceType.mouse => 'Mice',
+    DeviceType.keyboard => 'Keyboards',
+    DeviceType.phone => 'Phones',
+    DeviceType.camera => 'Cameras',
+    DeviceType.storage => 'Storage',
+    DeviceType.unknown => 'Unknown devices',
+    DeviceType.bluetooth => 'Bluetooth devices',
+  };
+}
+
 class _DeviceGroup extends StatelessWidget {
   const _DeviceGroup({
-    required this.type,
+    required this.title,
     required this.devices,
     required this.selectedDeviceIds,
     required this.onDeviceSelected,
   });
 
-  final DeviceType type;
+  final String title;
   final List<Device> devices;
   final Set<String> selectedDeviceIds;
   final ValueChanged<String> onDeviceSelected;
@@ -122,10 +290,7 @@ class _DeviceGroup extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              _labelFor(type),
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            child: Text(title, style: Theme.of(context).textTheme.titleLarge),
           ),
           Wrap(
             spacing: 12,
@@ -143,22 +308,42 @@ class _DeviceGroup extends StatelessWidget {
       ),
     );
   }
+}
 
-  String _labelFor(DeviceType type) {
-    return switch (type) {
-      DeviceType.printer => 'Printers',
-      DeviceType.plotter => 'Plotters',
-      DeviceType.monitor => 'Monitors',
-      DeviceType.headset => 'Headsets',
-      DeviceType.microphone => 'Microphones',
-      DeviceType.mouse => 'Mice',
-      DeviceType.keyboard => 'Keyboards',
-      DeviceType.phone => 'Phones',
-      DeviceType.camera => 'Cameras',
-      DeviceType.storage => 'Storage',
-      DeviceType.unknown => 'Unknown devices',
-      DeviceType.bluetooth => 'Bluetooth devices',
-    };
+class _AboutPage extends StatelessWidget {
+  const _AboutPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.devices_other,
+                size: 64,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Devices and Printers',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'A centralized Linux view for discovering and managing '
+                'connected devices and printers.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -192,6 +377,7 @@ class _DeviceCardState extends State<_DeviceCard> {
       child: GestureDetector(
         onTap: () => widget.onSelected(widget.device.id),
         child: AnimatedContainer(
+          key: ValueKey(widget.device.id),
           duration: const Duration(milliseconds: 150),
           width: 156,
           height: 160,
