@@ -14,6 +14,13 @@ integration, including native Linux window decorations managed by the desktop
 environment. Do not replace native window-manager behavior with a custom
 titlebar unless the change is explicitly requested and documented.
 
+The Linux application is single-instance. When validating changes by running
+the application, do not launch a second copy while an existing instance is
+active. Restart the existing Flutter/Linux execution after code changes; if the
+running process cannot be reached, stop or close that execution and start it
+again before continuing validation. A failed debug connection must not be
+treated as proof that the application is not already running.
+
 ## Architecture
 
 - Use the MVVM pattern: Model, View, and ViewModel.
