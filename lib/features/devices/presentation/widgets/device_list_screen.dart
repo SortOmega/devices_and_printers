@@ -150,6 +150,7 @@ class _DeviceGroup extends StatelessWidget {
       DeviceType.plotter => 'Plotters',
       DeviceType.monitor => 'Monitors',
       DeviceType.headset => 'Headsets',
+      DeviceType.microphone => 'Microphones',
       DeviceType.mouse => 'Mice',
       DeviceType.keyboard => 'Keyboards',
       DeviceType.phone => 'Phones',
@@ -269,6 +270,7 @@ IconData iconForDevice(Device device) {
     DeviceType.plotter => Icons.print,
     DeviceType.monitor => Icons.monitor,
     DeviceType.headset => Icons.headset,
+    DeviceType.microphone => Icons.mic,
     DeviceType.mouse => Icons.mouse,
     DeviceType.keyboard => Icons.keyboard,
     DeviceType.phone => Icons.smartphone,
@@ -283,6 +285,7 @@ String connectionLabel(DeviceConnection connection) {
   return switch (connection) {
     DeviceConnection.usb => 'USB',
     DeviceConnection.bluetooth => 'Bluetooth',
+    DeviceConnection.audioJack => 'Audio jack',
     DeviceConnection.network => 'Network',
     DeviceConnection.local => 'Local',
     DeviceConnection.unknown => 'Unknown connection',

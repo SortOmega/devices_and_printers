@@ -3,6 +3,7 @@ enum DeviceType {
   plotter,
   monitor,
   headset,
+  microphone,
   mouse,
   keyboard,
   phone,
@@ -12,7 +13,7 @@ enum DeviceType {
   bluetooth,
 }
 
-enum DeviceConnection { usb, bluetooth, network, local, unknown }
+enum DeviceConnection { usb, bluetooth, audioJack, network, local, unknown }
 
 enum DeviceStatus { active, inactive, disconnected }
 

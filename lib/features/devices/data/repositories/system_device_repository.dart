@@ -15,6 +15,8 @@ class SystemDeviceRepository implements DeviceRepository {
       _commandRunner.run('lsusb', const []),
       _commandRunner.run('bluetoothctl', ['devices']),
       _commandRunner.run('bluetoothctl', ['devices', 'Connected']),
+      _commandRunner.run('pactl', ['list', 'sinks']),
+      _commandRunner.run('pactl', ['list', 'sources']),
     ]);
 
     final printers = _parsePrinters(results[0].stdout);
@@ -22,6 +24,7 @@ class SystemDeviceRepository implements DeviceRepository {
       ...printers,
       ..._parseUsbDevices(results[1].stdout, printers),
       ..._parseBluetoothDevices(results[2].stdout, results[3].stdout),
+      ..._parseAudioDevices(results[4].stdout, results[5].stdout),
     ];
   }
 
@@ -184,6 +187,98 @@ class SystemDeviceRepository implements DeviceRepository {
         .toList();
   }
 
+  List<Device> _parseAudioDevices(String sinksOutput, String sourcesOutput) {
+    return [
+      ..._parseAudioPorts(
+        sinksOutput,
+        sectionPattern: RegExp(r'^Sink #'),
+        deviceType: DeviceType.headset,
+        portPattern: RegExp(
+          r'\[Out\]\s+(Headphones|Headset)\b',
+          caseSensitive: false,
+        ),
+        excludedNamePattern: RegExp(r'\.monitor\b', caseSensitive: false),
+      ),
+      ..._parseAudioPorts(
+        sourcesOutput,
+        sectionPattern: RegExp(r'^Source #'),
+        deviceType: DeviceType.microphone,
+        portPattern: RegExp(
+          r'\[In\]\s+(Headset|Headset Microphone|Microphone|Mic)\b',
+          caseSensitive: false,
+        ),
+        excludedNamePattern: RegExp(r'\.monitor\b', caseSensitive: false),
+      ),
+    ];
+  }
+
+  List<Device> _parseAudioPorts(
+    String output, {
+    required RegExp sectionPattern,
+    required DeviceType deviceType,
+    required RegExp portPattern,
+    required RegExp excludedNamePattern,
+  }) {
+    final devices = <Device>[];
+    final sections = output.split('\n');
+    var section = <String>[];
+
+    void addSection() {
+      if (section.isEmpty) {
+        return;
+      }
+      final name = _audioField(section, 'Name');
+      final description = _audioField(section, 'Description');
+      final availablePort = section.where(
+        (line) =>
+            line.contains('available') &&
+            portPattern.hasMatch(line) &&
+            !line.contains('not available'),
+      );
+      if (name == null ||
+          description == null ||
+          excludedNamePattern.hasMatch(name) ||
+          availablePort.isEmpty) {
+        return;
+      }
+
+      final portLine = availablePort.first;
+      final portName = portPattern.firstMatch(portLine)?.group(1);
+      devices.add(
+        Device(
+          id: 'audio:$name',
+          name: description,
+          type: deviceType,
+          connection: DeviceConnection.audioJack,
+          status: DeviceStatus.active,
+          details: portName ?? portLine.trim(),
+        ),
+      );
+    }
+
+    for (final line in sections) {
+      if (sectionPattern.hasMatch(line)) {
+        addSection();
+        section = [line];
+      } else if (section.isNotEmpty) {
+        section.add(line);
+      }
+    }
+    addSection();
+    return devices;
+  }
+
+  String? _audioField(List<String> section, String field) {
+    final prefix = RegExp('^\\s*$field:\\s*(.+)\$');
+    for (final line in section) {
+      final match = prefix.firstMatch(line);
+      if (match != null) {
+        return match.group(1);
+      }
+    }
+    return null;
+  }
+
   DeviceType? _classifyDevice(String name) {
     final normalizedName = name.toLowerCase();
     if (_containsAny(normalizedName, ['plotter', 'plot'])) {
@@ -202,6 +297,9 @@ class SystemDeviceRepository implements DeviceRepository {
       'auricular',
     ])) {
       return DeviceType.headset;
+    }
+    if (_containsAny(normalizedName, ['microphone', 'mic'])) {
+      return DeviceType.microphone;
     }
     if (_containsAny(normalizedName, ['mouse', 'raton', 'ratón'])) {
       return DeviceType.mouse;

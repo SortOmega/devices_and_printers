@@ -153,4 +153,79 @@ void main() {
     expect(devices.single.type, DeviceType.plotter);
     expect(devices.single.connection, DeviceConnection.usb);
   });
+
+  test('detects available headphones and jack microphones', () async {
+    final repository = SystemDeviceRepository(
+      commandRunner: FakeCommandRunner({
+        'lpstat': const CommandResult(stdout: '', stderr: '', exitCode: 0),
+        'lsusb': const CommandResult(stdout: '', stderr: '', exitCode: 0),
+        'bluetoothctl devices': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'bluetoothctl devices Connected': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'pactl list sinks': const CommandResult(
+          stdout:
+              'Sink #12\n'
+              '\tName: alsa_output.pci.Headphones_sink\n'
+              '\tDescription: Built-in Audio Headphones\n'
+              '\tPorts:\n'
+              '\t\t[Out] Headphones: Headphones (available)\n'
+              '\tActive Port: [Out] HDMI\n'
+              'Sink #13\n'
+              '\tName: alsa_output.pci.HDMI_sink\n'
+              '\tDescription: HDMI Output\n'
+              '\tPorts:\n'
+              '\t\t[Out] HDMI: HDMI (available)\n'
+              '\tActive Port: [Out] HDMI\n',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'pactl list sources': const CommandResult(
+          stdout:
+              'Source #14\n'
+              '\tName: alsa_input.pci.Headset_source\n'
+              '\tDescription: Built-in Audio Headset Microphone\n'
+              '\tPorts:\n'
+              '\t\t[In] Headset: Headset (available)\n'
+              '\tActive Port: [In] Headset\n'
+              'Source #15\n'
+              '\tName: alsa_input.pci.Digital_source\n'
+              '\tDescription: Built-in Digital Microphone\n'
+              '\tPorts:\n'
+              '\t\t[In] Mic1: Mic1 (available)\n'
+              '\tActive Port: [In] Mic1\n',
+          stderr: '',
+          exitCode: 0,
+        ),
+      }),
+    );
+
+    final devices = await repository.getDevices();
+
+    expect(devices, hasLength(2));
+    expect(
+      devices.where((device) => device.type == DeviceType.headset),
+      hasLength(1),
+    );
+    expect(
+      devices.where((device) => device.type == DeviceType.microphone),
+      hasLength(1),
+    );
+    expect(
+      devices.every((device) => device.status == DeviceStatus.active),
+      isTrue,
+    );
+    expect(
+      devices.every(
+        (device) => device.connection == DeviceConnection.audioJack,
+      ),
+      isTrue,
+    );
+  });
 }
