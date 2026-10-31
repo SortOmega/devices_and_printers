@@ -81,40 +81,38 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   }
 
   Widget _buildPrimaryHeader(BuildContext context) {
-    final theme = Theme.of(context);
     return Material(
-      color: theme.colorScheme.surface,
+      color: Theme.of(context).colorScheme.surface,
       elevation: 1,
       child: SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Wrap(
-            spacing: 24,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Icon(Icons.devices, color: theme.colorScheme.primary),
-              Text('Devices and Printers', style: theme.textTheme.titleLarge),
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(
-                    value: 'devices',
-                    label: Text('View Devices'),
-                    icon: Icon(Icons.devices_other),
-                  ),
-                  ButtonSegment(
-                    value: 'about',
-                    label: Text('About'),
-                    icon: Icon(Icons.info_outline),
-                  ),
-                ],
-                selected: {_activePage},
-                onSelectionChanged: (selection) {
-                  setState(() => _activePage = selection.first);
-                },
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: SegmentedButton<String>(
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                padding: const WidgetStatePropertyAll(
+                  EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                ),
               ),
-            ],
+              segments: const [
+                ButtonSegment(
+                  value: 'devices',
+                  label: Text('View Devices'),
+                  icon: Icon(Icons.devices_other, size: 18),
+                ),
+                ButtonSegment(
+                  value: 'about',
+                  label: Text('About'),
+                  icon: Icon(Icons.info_outline, size: 18),
+                ),
+              ],
+              selected: {_activePage},
+              onSelectionChanged: (selection) {
+                setState(() => _activePage = selection.first);
+              },
+            ),
           ),
         ),
       ),
@@ -123,17 +121,21 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
 
   Widget _buildDevicesHeader(BuildContext context) {
     return Material(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      // color: Theme.of(context).colorScheme.surfaceContainer,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Wrap(
-          spacing: 12,
-          runSpacing: 8,
+          spacing: 6,
+          runSpacing: 4,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             DropdownButton<String>(
               value: _sortOption,
+              isDense: true,
               underline: const SizedBox.shrink(),
+              iconSize: 18,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              style: Theme.of(context).textTheme.labelLarge,
               onChanged: (value) {
                 if (value != null) setState(() => _sortOption = value);
               },
@@ -148,7 +150,11 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
             ),
             DropdownButton<String>(
               value: _groupOption,
+              isDense: true,
               underline: const SizedBox.shrink(),
+              iconSize: 18,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              style: Theme.of(context).textTheme.labelLarge,
               onChanged: (value) {
                 if (value != null) setState(() => _groupOption = value);
               },
@@ -161,18 +167,30 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
                 ),
               ],
             ),
-            const SizedBox(width: 8),
             FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 32),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                visualDensity: VisualDensity.comfortable,
+              ),
               onPressed: () => _showAddDialog(context, 'device'),
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add, size: 18),
               label: const Text('Add Device'),
             ),
             OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(0, 32),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                visualDensity: VisualDensity.comfortable,
+              ),
               onPressed: () => _showAddDialog(context, 'printer'),
-              icon: const Icon(Icons.print),
+              icon: const Icon(Icons.print, size: 18),
               label: const Text('Add Printer'),
             ),
             IconButton(
+              constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+              padding: EdgeInsets.zero,
+              visualDensity: VisualDensity.compact,
               onPressed: widget.viewModel.loadDevices,
               tooltip: 'Refresh devices',
               icon: const Icon(Icons.refresh),
