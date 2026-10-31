@@ -17,6 +17,9 @@ The first implementation queries the Linux system and displays:
   devices instead of disappearing.
 - Known Bluetooth devices reported by `bluetoothctl`, including devices that
   are currently disconnected.
+- Headphones and jack microphones reported by PipeWire/PulseAudio through
+  `pactl`, using only physically available audio ports and excluding internal
+  digital microphones and monitor sources.
 - Built-in Bluetooth adapters and controllers are excluded because they are
   system infrastructure, not user-interactable peripherals.
 - System-configured printers and devices known to the operating system.
