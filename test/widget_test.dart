@@ -181,4 +181,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Group: Status'), findsOneWidget);
   });
+
+  testWidgets('shows appearance and language settings', (
+    WidgetTester tester,
+  ) async {
+    final viewModel = DeviceListViewModel(FakeDeviceRepository())
+      ..loadDevices();
+
+    await tester.pumpWidget(
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Appearance'), findsOneWidget);
+    expect(find.text('Theme'), findsOneWidget);
+    expect(find.text('Color mode'), findsOneWidget);
+    expect(find.text('Interface size'), findsOneWidget);
+    expect(find.text('Language'), findsNWidgets(2));
+  });
 }

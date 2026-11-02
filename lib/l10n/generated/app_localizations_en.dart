@@ -81,6 +81,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get language => 'Language';
 
   @override
+  String get settings => 'Settings';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get themeCupertino => 'Cupertino';
+
+  @override
+  String get themeMaterial => 'Material';
+
+  @override
+  String get themeFluent => 'Fluent';
+
+  @override
+  String get colorMode => 'Color mode';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get systemDefault => 'System default';
+
+  @override
+  String get interfaceSize => 'Interface size';
+
+  @override
+  String get interfaceSizeLarge => 'Large';
+
+  @override
+  String get interfaceSizeNormal => 'Normal';
+
+  @override
+  String get interfaceSizeCompact => 'Compact';
+
+  @override
   String get systemLanguage => 'System language';
 
   @override

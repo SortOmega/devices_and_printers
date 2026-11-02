@@ -4,6 +4,7 @@ import '../../../../core/localization/locale_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/models/device.dart';
 import '../view_models/device_list_view_model.dart';
+import '../../../settings/presentation/screens/settings_screen.dart';
 
 class DeviceListScreen extends StatefulWidget {
   const DeviceListScreen({
@@ -79,9 +80,13 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
               _buildPrimaryHeader(context),
               if (_activePage == 'devices') _buildDevicesHeader(context),
               Expanded(
-                child: _activePage == 'devices'
-                    ? _buildBody(context)
-                    : const _AboutPage(),
+                child: switch (_activePage) {
+                  'devices' => _buildBody(context),
+                  'settings' => SettingsScreen(
+                    localeProvider: widget.localeProvider,
+                  ),
+                  _ => const _AboutPage(),
+                },
               ),
             ],
           ),
@@ -120,18 +125,17 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
                       label: Text(AppLocalizations.of(context).about),
                       icon: Icon(Icons.info_outline, size: 18),
                     ),
+                    ButtonSegment(
+                      value: 'settings',
+                      label: Text(AppLocalizations.of(context).settings),
+                      icon: Icon(Icons.settings_outlined, size: 18),
+                    ),
                   ],
                   selected: {_activePage},
                   onSelectionChanged: (selection) {
                     setState(() => _activePage = selection.first);
                   },
                 ),
-                if (widget.localeProvider != null)
-                  IconButton(
-                    tooltip: AppLocalizations.of(context).language,
-                    onPressed: () => _showLanguageDialog(context),
-                    icon: const Icon(Icons.language),
-                  ),
               ],
             ),
           ),
@@ -248,52 +252,6 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
             child: Text(l10n.close),
           ),
         ],
-      ),
-    );
-  }
-
-  Future<void> _showLanguageDialog(BuildContext context) {
-    final localeProvider = widget.localeProvider;
-    if (localeProvider == null) {
-      return Future.value();
-    }
-    final l10n = AppLocalizations.of(context);
-    return showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.language),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButton<Locale>(
-              value: localeProvider.locale,
-              items: [
-                DropdownMenuItem(
-                  value: const Locale('en'),
-                  child: Text(l10n.english),
-                ),
-                DropdownMenuItem(
-                  value: const Locale('es'),
-                  child: Text(l10n.spanish),
-                ),
-              ],
-              onChanged: (locale) {
-                if (locale != null) {
-                  localeProvider.setLocale(locale);
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-            if (localeProvider.hasManualLocale)
-              TextButton(
-                onPressed: () {
-                  localeProvider.useSystemLocale();
-                  Navigator.of(context).pop();
-                },
-                child: Text(l10n.systemLanguage),
-              ),
-          ],
-        ),
       ),
     );
   }

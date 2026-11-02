@@ -224,6 +224,90 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @themeCupertino.
+  ///
+  /// In en, this message translates to:
+  /// **'Cupertino'**
+  String get themeCupertino;
+
+  /// No description provided for @themeMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Material'**
+  String get themeMaterial;
+
+  /// No description provided for @themeFluent.
+  ///
+  /// In en, this message translates to:
+  /// **'Fluent'**
+  String get themeFluent;
+
+  /// No description provided for @colorMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Color mode'**
+  String get colorMode;
+
+  /// No description provided for @light.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// No description provided for @dark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get dark;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get systemDefault;
+
+  /// No description provided for @interfaceSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Interface size'**
+  String get interfaceSize;
+
+  /// No description provided for @interfaceSizeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get interfaceSizeLarge;
+
+  /// No description provided for @interfaceSizeNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get interfaceSizeNormal;
+
+  /// No description provided for @interfaceSizeCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get interfaceSizeCompact;
+
   /// No description provided for @systemLanguage.
   ///
   /// In en, this message translates to:
