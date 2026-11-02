@@ -9,7 +9,7 @@ import 'core/theme/theme_provider.dart';
 import 'core/theme/theme_storage.dart';
 import 'features/devices/data/repositories/system_device_repository.dart';
 import 'features/devices/presentation/view_models/device_list_view_model.dart';
-import 'features/devices/presentation/widgets/device_list_screen.dart';
+import 'features/devices/presentation/widgets/windows/devices_window.dart';
 import 'l10n/generated/app_localizations.dart';
 
 Future<void> main() async {

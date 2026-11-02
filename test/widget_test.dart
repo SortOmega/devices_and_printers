@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:devices_and_printers/features/devices/domain/models/device.dart';
 import 'package:devices_and_printers/features/devices/domain/repositories/device_repository.dart';
 import 'package:devices_and_printers/features/devices/presentation/view_models/device_list_view_model.dart';
-import 'package:devices_and_printers/features/devices/presentation/widgets/device_list_screen.dart';
+import 'package:devices_and_printers/features/devices/presentation/widgets/windows/devices_window.dart';
 import 'package:devices_and_printers/l10n/generated/app_localizations.dart';
 
 class FakeDeviceRepository implements DeviceRepository {
