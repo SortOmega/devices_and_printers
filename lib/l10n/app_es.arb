@@ -1,0 +1,65 @@
+{
+  "@@locale": "es",
+  "appTitle": "Dispositivos e impresoras",
+  "viewDevices": "Ver dispositivos",
+  "about": "Acerca de",
+  "sortName": "Ordenar: nombre",
+  "sortStatus": "Ordenar: estado",
+  "sortConnection": "Ordenar: conexión",
+  "groupType": "Agrupar: tipo",
+  "groupStatus": "Agrupar: estado",
+  "groupConnection": "Agrupar: conexión",
+  "addDevice": "Añadir dispositivo",
+  "addPrinter": "Añadir impresora",
+  "refreshDevices": "Actualizar dispositivos",
+  "close": "Cerrar",
+  "tryAgain": "Intentar de nuevo",
+  "unableToLoadDevices": "No se pudieron cargar los dispositivos",
+  "unableToQuerySystemDevices": "No se pudieron consultar los dispositivos del sistema: {error}",
+  "@unableToQuerySystemDevices": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "noConnectedDevices": "No se encontraron dispositivos ni impresoras conectados.",
+  "knownDevices": "{count} dispositivos conocidos",
+  "@knownDevices": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addItemUnavailable": "{item} estará disponible cuando se añada la integración con la configuración del sistema.",
+  "@addItemUnavailable": {
+    "placeholders": {
+      "item": {}
+    }
+  },
+  "aboutDescription": "Una vista centralizada de Linux para descubrir y gestionar dispositivos e impresoras conectados.",
+  "language": "Idioma",
+  "systemLanguage": "Idioma del sistema",
+  "english": "Inglés",
+  "spanish": "Español",
+  "printers": "Impresoras",
+  "plotters": "Plotters",
+  "monitors": "Monitores",
+  "headsets": "Auriculares",
+  "microphones": "Micrófonos",
+  "mice": "Ratones",
+  "keyboards": "Teclados",
+  "phones": "Teléfonos",
+  "cameras": "Cámaras",
+  "storage": "Almacenamiento",
+  "unknownDevices": "Dispositivos desconocidos",
+  "bluetoothDevices": "Dispositivos Bluetooth",
+  "usb": "USB",
+  "bluetooth": "Bluetooth",
+  "audioJack": "Conector de audio",
+  "network": "Red",
+  "local": "Local",
+  "unknownConnection": "Conexión desconocida",
+  "active": "Activo",
+  "inactive": "Inactivo",
+  "disconnected": "Desconectado"
+}

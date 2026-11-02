@@ -1,0 +1,65 @@
+{
+  "@@locale": "en",
+  "appTitle": "Devices and Printers",
+  "viewDevices": "View Devices",
+  "about": "About",
+  "sortName": "Sort: Name",
+  "sortStatus": "Sort: Status",
+  "sortConnection": "Sort: Connection",
+  "groupType": "Group: Type",
+  "groupStatus": "Group: Status",
+  "groupConnection": "Group: Connection",
+  "addDevice": "Add Device",
+  "addPrinter": "Add Printer",
+  "refreshDevices": "Refresh devices",
+  "close": "Close",
+  "tryAgain": "Try again",
+  "unableToLoadDevices": "Unable to load devices",
+  "unableToQuerySystemDevices": "Unable to query system devices: {error}",
+  "@unableToQuerySystemDevices": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "noConnectedDevices": "No connected devices or printers were found.",
+  "knownDevices": "{count} known devices",
+  "@knownDevices": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addItemUnavailable": "{item} will be available when system configuration integration is added.",
+  "@addItemUnavailable": {
+    "placeholders": {
+      "item": {}
+    }
+  },
+  "aboutDescription": "A centralized Linux view for discovering and managing connected devices and printers.",
+  "language": "Language",
+  "systemLanguage": "System language",
+  "english": "English",
+  "spanish": "Spanish",
+  "printers": "Printers",
+  "plotters": "Plotters",
+  "monitors": "Monitors",
+  "headsets": "Headsets",
+  "microphones": "Microphones",
+  "mice": "Mice",
+  "keyboards": "Keyboards",
+  "phones": "Phones",
+  "cameras": "Cameras",
+  "storage": "Storage",
+  "unknownDevices": "Unknown devices",
+  "bluetoothDevices": "Bluetooth devices",
+  "usb": "USB",
+  "bluetooth": "Bluetooth",
+  "audioJack": "Audio jack",
+  "network": "Network",
+  "local": "Local",
+  "unknownConnection": "Unknown connection",
+  "active": "Active",
+  "inactive": "Inactive",
+  "disconnected": "Disconnected"
+}

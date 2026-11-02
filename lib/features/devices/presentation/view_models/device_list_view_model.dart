@@ -22,7 +22,7 @@ class DeviceListViewModel extends ChangeNotifier {
       status = DeviceListStatus.loaded;
     } catch (error) {
       status = DeviceListStatus.error;
-      errorMessage = 'Unable to query system devices: $error';
+      errorMessage = error.toString();
     }
     notifyListeners();
   }

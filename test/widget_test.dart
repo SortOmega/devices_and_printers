@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:devices_and_printers/features/devices/domain/models/device.dart';
 import 'package:devices_and_printers/features/devices/domain/repositories/device_repository.dart';
 import 'package:devices_and_printers/features/devices/presentation/view_models/device_list_view_model.dart';
 import 'package:devices_and_printers/features/devices/presentation/widgets/device_list_screen.dart';
+import 'package:devices_and_printers/l10n/generated/app_localizations.dart';
 
 class FakeDeviceRepository implements DeviceRepository {
   @override
@@ -26,6 +28,19 @@ class FakeDeviceRepository implements DeviceRepository {
   ];
 }
 
+Widget localizedApp(Widget home) {
+  return MaterialApp(
+    localizationsDelegates: const [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('en'), Locale('es')],
+    home: home,
+  );
+}
+
 void main() {
   testWidgets('shows queried devices grouped by type', (
     WidgetTester tester,
@@ -34,7 +49,7 @@ void main() {
       ..loadDevices();
 
     await tester.pumpWidget(
-      MaterialApp(home: DeviceListScreen(viewModel: viewModel)),
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
     );
     await tester.pumpAndSettle();
 
@@ -51,7 +66,7 @@ void main() {
       ..loadDevices();
 
     await tester.pumpWidget(
-      MaterialApp(home: DeviceListScreen(viewModel: viewModel)),
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
     );
     await tester.pumpAndSettle();
 
@@ -77,7 +92,7 @@ void main() {
       ..loadDevices();
 
     await tester.pumpWidget(
-      MaterialApp(home: DeviceListScreen(viewModel: viewModel)),
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
     );
     await tester.pumpAndSettle();
 
@@ -110,7 +125,7 @@ void main() {
       ..loadDevices();
 
     await tester.pumpWidget(
-      MaterialApp(home: DeviceListScreen(viewModel: viewModel)),
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
     );
     await tester.pumpAndSettle();
 
@@ -149,7 +164,7 @@ void main() {
       ..loadDevices();
 
     await tester.pumpWidget(
-      MaterialApp(home: DeviceListScreen(viewModel: viewModel)),
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
     );
     await tester.pumpAndSettle();
 

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/locale_provider.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/models/device.dart';
 import '../view_models/device_list_view_model.dart';
 
 class DeviceListScreen extends StatefulWidget {
-  const DeviceListScreen({required this.viewModel, super.key});
+  const DeviceListScreen({
+    required this.viewModel,
+    this.localeProvider,
+    super.key,
+  });
 
   final DeviceListViewModel viewModel;
+  final LocaleProvider? localeProvider;
 
   @override
   State<DeviceListScreen> createState() => _DeviceListScreenState();
@@ -34,24 +41,27 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   }
 
   List<MapEntry<String, List<Device>>> _deviceGroups() {
+    final l10n = AppLocalizations.of(context);
     final devices = [...widget.viewModel.devices]
       ..sort((first, second) {
         return switch (_sortOption) {
           'status' => statusLabel(
             first.status,
-          ).compareTo(statusLabel(second.status)),
+            l10n,
+          ).compareTo(statusLabel(second.status, l10n)),
           'connection' => connectionLabel(
             first.connection,
-          ).compareTo(connectionLabel(second.connection)),
+            l10n,
+          ).compareTo(connectionLabel(second.connection, l10n)),
           _ => first.name.toLowerCase().compareTo(second.name.toLowerCase()),
         };
       });
     final groups = <String, List<Device>>{};
     for (final device in devices) {
       final key = switch (_groupOption) {
-        'status' => statusLabel(device.status),
-        'connection' => connectionLabel(device.connection),
-        _ => _labelForType(device.type),
+        'status' => statusLabel(device.status, l10n),
+        'connection' => connectionLabel(device.connection, l10n),
+        _ => _labelForType(device.type, l10n),
       };
       groups.putIfAbsent(key, () => []).add(device);
     }
@@ -89,29 +99,40 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
-            child: SegmentedButton<String>(
-              style: ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                padding: const WidgetStatePropertyAll(
-                  EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SegmentedButton<String>(
+                  style: ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                    padding: const WidgetStatePropertyAll(
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    ),
+                  ),
+                  segments: [
+                    ButtonSegment(
+                      value: 'devices',
+                      label: Text(AppLocalizations.of(context).viewDevices),
+                      icon: Icon(Icons.devices_other, size: 18),
+                    ),
+                    ButtonSegment(
+                      value: 'about',
+                      label: Text(AppLocalizations.of(context).about),
+                      icon: Icon(Icons.info_outline, size: 18),
+                    ),
+                  ],
+                  selected: {_activePage},
+                  onSelectionChanged: (selection) {
+                    setState(() => _activePage = selection.first);
+                  },
                 ),
-              ),
-              segments: const [
-                ButtonSegment(
-                  value: 'devices',
-                  label: Text('View Devices'),
-                  icon: Icon(Icons.devices_other, size: 18),
-                ),
-                ButtonSegment(
-                  value: 'about',
-                  label: Text('About'),
-                  icon: Icon(Icons.info_outline, size: 18),
-                ),
+                if (widget.localeProvider != null)
+                  IconButton(
+                    tooltip: AppLocalizations.of(context).language,
+                    onPressed: () => _showLanguageDialog(context),
+                    icon: const Icon(Icons.language),
+                  ),
               ],
-              selected: {_activePage},
-              onSelectionChanged: (selection) {
-                setState(() => _activePage = selection.first);
-              },
             ),
           ),
         ),
@@ -139,12 +160,18 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
               onChanged: (value) {
                 if (value != null) setState(() => _sortOption = value);
               },
-              items: const [
-                DropdownMenuItem(value: 'name', child: Text('Sort: Name')),
-                DropdownMenuItem(value: 'status', child: Text('Sort: Status')),
+              items: [
+                DropdownMenuItem(
+                  value: 'name',
+                  child: Text(AppLocalizations.of(context).sortName),
+                ),
+                DropdownMenuItem(
+                  value: 'status',
+                  child: Text(AppLocalizations.of(context).sortStatus),
+                ),
                 DropdownMenuItem(
                   value: 'connection',
-                  child: Text('Sort: Connection'),
+                  child: Text(AppLocalizations.of(context).sortConnection),
                 ),
               ],
             ),
@@ -158,12 +185,18 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
               onChanged: (value) {
                 if (value != null) setState(() => _groupOption = value);
               },
-              items: const [
-                DropdownMenuItem(value: 'type', child: Text('Group: Type')),
-                DropdownMenuItem(value: 'status', child: Text('Group: Status')),
+              items: [
+                DropdownMenuItem(
+                  value: 'type',
+                  child: Text(AppLocalizations.of(context).groupType),
+                ),
+                DropdownMenuItem(
+                  value: 'status',
+                  child: Text(AppLocalizations.of(context).groupStatus),
+                ),
                 DropdownMenuItem(
                   value: 'connection',
-                  child: Text('Group: Connection'),
+                  child: Text(AppLocalizations.of(context).groupConnection),
                 ),
               ],
             ),
@@ -175,7 +208,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
               ),
               onPressed: () => _showAddDialog(context, 'device'),
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add Device'),
+              label: Text(AppLocalizations.of(context).addDevice),
             ),
             OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
@@ -185,14 +218,14 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
               ),
               onPressed: () => _showAddDialog(context, 'printer'),
               icon: const Icon(Icons.print, size: 18),
-              label: const Text('Add Printer'),
+              label: Text(AppLocalizations.of(context).addPrinter),
             ),
             IconButton(
               constraints: const BoxConstraints.tightFor(width: 32, height: 32),
               padding: EdgeInsets.zero,
               visualDensity: VisualDensity.compact,
               onPressed: widget.viewModel.loadDevices,
-              tooltip: 'Refresh devices',
+              tooltip: AppLocalizations.of(context).refreshDevices,
               icon: const Icon(Icons.refresh),
             ),
           ],
@@ -202,21 +235,65 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   }
 
   Future<void> _showAddDialog(BuildContext context, String itemType) {
-    final title = itemType == 'printer' ? 'Add Printer' : 'Add Device';
+    final l10n = AppLocalizations.of(context);
+    final title = itemType == 'printer' ? l10n.addPrinter : l10n.addDevice;
     return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(title),
-        content: Text(
-          '$title will be available when system configuration integration '
-          'is added.',
-        ),
+        content: Text(l10n.addItemUnavailable(title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(l10n.close),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _showLanguageDialog(BuildContext context) {
+    final localeProvider = widget.localeProvider;
+    if (localeProvider == null) {
+      return Future.value();
+    }
+    final l10n = AppLocalizations.of(context);
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.language),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButton<Locale>(
+              value: localeProvider.locale,
+              items: [
+                DropdownMenuItem(
+                  value: const Locale('en'),
+                  child: Text(l10n.english),
+                ),
+                DropdownMenuItem(
+                  value: const Locale('es'),
+                  child: Text(l10n.spanish),
+                ),
+              ],
+              onChanged: (locale) {
+                if (locale != null) {
+                  localeProvider.setLocale(locale);
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+            if (localeProvider.hasManualLocale)
+              TextButton(
+                onPressed: () {
+                  localeProvider.useSystemLocale();
+                  Navigator.of(context).pop();
+                },
+                child: Text(l10n.systemLanguage),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -230,19 +307,25 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.viewModel.errorMessage ?? 'Unable to load devices'),
+            Text(
+              widget.viewModel.errorMessage == null
+                  ? AppLocalizations.of(context).unableToLoadDevices
+                  : AppLocalizations.of(context).unableToQuerySystemDevices(
+                      widget.viewModel.errorMessage!,
+                    ),
+            ),
             const SizedBox(height: 12),
             FilledButton(
               onPressed: widget.viewModel.loadDevices,
-              child: const Text('Try again'),
+              child: Text(AppLocalizations.of(context).tryAgain),
             ),
           ],
         ),
       );
     }
     if (widget.viewModel.devices.isEmpty) {
-      return const Center(
-        child: Text('No connected devices or printers were found.'),
+      return Center(
+        child: Text(AppLocalizations.of(context).noConnectedDevices),
       );
     }
 
@@ -252,7 +335,8 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            '${widget.viewModel.devices.length} known devices',
+            AppLocalizations.of(context)
+                .knownDevices(widget.viewModel.devices.length),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
@@ -269,20 +353,20 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   }
 }
 
-String _labelForType(DeviceType type) {
+String _labelForType(DeviceType type, AppLocalizations l10n) {
   return switch (type) {
-    DeviceType.printer => 'Printers',
-    DeviceType.plotter => 'Plotters',
-    DeviceType.monitor => 'Monitors',
-    DeviceType.headset => 'Headsets',
-    DeviceType.microphone => 'Microphones',
-    DeviceType.mouse => 'Mice',
-    DeviceType.keyboard => 'Keyboards',
-    DeviceType.phone => 'Phones',
-    DeviceType.camera => 'Cameras',
-    DeviceType.storage => 'Storage',
-    DeviceType.unknown => 'Unknown devices',
-    DeviceType.bluetooth => 'Bluetooth devices',
+    DeviceType.printer => l10n.printers,
+    DeviceType.plotter => l10n.plotters,
+    DeviceType.monitor => l10n.monitors,
+    DeviceType.headset => l10n.headsets,
+    DeviceType.microphone => l10n.microphones,
+    DeviceType.mouse => l10n.mice,
+    DeviceType.keyboard => l10n.keyboards,
+    DeviceType.phone => l10n.phones,
+    DeviceType.camera => l10n.cameras,
+    DeviceType.storage => l10n.storage,
+    DeviceType.unknown => l10n.unknownDevices,
+    DeviceType.bluetooth => l10n.bluetoothDevices,
   };
 }
 
@@ -348,13 +432,12 @@ class _AboutPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Devices and Printers',
+                AppLocalizations.of(context).appTitle,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'A centralized Linux view for discovering and managing '
-                'connected devices and printers.',
+              Text(
+                AppLocalizations.of(context).aboutDescription,
                 textAlign: TextAlign.center,
               ),
             ],
@@ -448,8 +531,8 @@ class _DeviceCardState extends State<_DeviceCard> {
                 style: theme.textTheme.bodyMedium,
               ),
               Text(
-                '${statusLabel(widget.device.status)} · '
-                '${connectionLabel(widget.device.connection)}',
+                '${statusLabel(widget.device.status, AppLocalizations.of(context))} · '
+                '${connectionLabel(widget.device.connection, AppLocalizations.of(context))}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelSmall,
@@ -485,21 +568,21 @@ IconData iconForDevice(Device device) {
   };
 }
 
-String connectionLabel(DeviceConnection connection) {
+String connectionLabel(DeviceConnection connection, AppLocalizations l10n) {
   return switch (connection) {
-    DeviceConnection.usb => 'USB',
-    DeviceConnection.bluetooth => 'Bluetooth',
-    DeviceConnection.audioJack => 'Audio jack',
-    DeviceConnection.network => 'Network',
-    DeviceConnection.local => 'Local',
-    DeviceConnection.unknown => 'Unknown connection',
+    DeviceConnection.usb => l10n.usb,
+    DeviceConnection.bluetooth => l10n.bluetooth,
+    DeviceConnection.audioJack => l10n.audioJack,
+    DeviceConnection.network => l10n.network,
+    DeviceConnection.local => l10n.local,
+    DeviceConnection.unknown => l10n.unknownConnection,
   };
 }
 
-String statusLabel(DeviceStatus status) {
+String statusLabel(DeviceStatus status, AppLocalizations l10n) {
   return switch (status) {
-    DeviceStatus.active => 'Active',
-    DeviceStatus.inactive => 'Inactive',
-    DeviceStatus.disconnected => 'Disconnected',
+    DeviceStatus.active => l10n.active,
+    DeviceStatus.inactive => l10n.inactive,
+    DeviceStatus.disconnected => l10n.disconnected,
   };
 }
