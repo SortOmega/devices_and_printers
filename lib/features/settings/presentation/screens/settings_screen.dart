@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/localization/locale_provider.dart';
+import '../../../../../core/theme/theme_provider.dart';
 import '../../../../../l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({this.localeProvider, super.key});
+  const SettingsScreen({this.localeProvider, this.themeProvider, super.key});
 
   final LocaleProvider? localeProvider;
+  final ThemeProvider? themeProvider;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String _theme = 'material';
   ThemeMode _colorMode = ThemeMode.system;
   String _interfaceSize = 'normal';
 
@@ -28,26 +29,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _SettingsSection(
           title: l10n.appearance,
           children: [
-            _SettingsDropdown<String>(
+            _SettingsDropdown<AppThemeStyle>(
               label: l10n.theme,
-              value: _theme,
+              value: widget.themeProvider?.themeStyle,
               items: [
                 DropdownMenuItem(
-                  value: 'cupertino',
+                  value: AppThemeStyle.cupertino,
                   child: Text(l10n.themeCupertino),
                 ),
                 DropdownMenuItem(
-                  value: 'material',
+                  value: AppThemeStyle.material,
                   child: Text(l10n.themeMaterial),
                 ),
                 DropdownMenuItem(
-                  value: 'fluent',
+                  value: AppThemeStyle.fluent,
                   child: Text(l10n.themeFluent),
                 ),
               ],
+              enabled: widget.themeProvider != null,
               onChanged: (value) {
                 if (value != null) {
-                  setState(() => _theme = value);
+                  widget.themeProvider?.setThemeStyle(value);
                 }
               },
             ),

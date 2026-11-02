@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/localization/locale_provider.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/models/device.dart';
 import '../view_models/device_list_view_model.dart';
@@ -10,11 +12,13 @@ class DeviceListScreen extends StatefulWidget {
   const DeviceListScreen({
     required this.viewModel,
     this.localeProvider,
+    this.themeProvider,
     super.key,
   });
 
   final DeviceListViewModel viewModel;
   final LocaleProvider? localeProvider;
+  final ThemeProvider? themeProvider;
 
   @override
   State<DeviceListScreen> createState() => _DeviceListScreenState();
@@ -84,6 +88,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
                   'devices' => _buildBody(context),
                   'settings' => SettingsScreen(
                     localeProvider: widget.localeProvider,
+                    themeProvider: widget.themeProvider,
                   ),
                   _ => const _AboutPage(),
                 },
@@ -158,6 +163,16 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
               value: _sortOption,
               isDense: true,
               underline: const SizedBox.shrink(),
+              borderRadius: BorderRadius.circular(
+                (Theme.of(context).extension<AppThemeGeometry>() ??
+                        const AppThemeGeometry(
+                          cardRadius: 12,
+                          controlRadius: 20,
+                          dialogRadius: 28,
+                        ))
+                    .controlRadius,
+              ),
+              dropdownColor: Theme.of(context).colorScheme.surfaceContainer,
               iconSize: 18,
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               style: Theme.of(context).textTheme.labelLarge,
@@ -183,6 +198,16 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
               value: _groupOption,
               isDense: true,
               underline: const SizedBox.shrink(),
+              borderRadius: BorderRadius.circular(
+                (Theme.of(context).extension<AppThemeGeometry>() ??
+                        const AppThemeGeometry(
+                          cardRadius: 12,
+                          controlRadius: 20,
+                          dialogRadius: 28,
+                        ))
+                    .controlRadius,
+              ),
+              dropdownColor: Theme.of(context).colorScheme.surfaceContainer,
               iconSize: 18,
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               style: Theme.of(context).textTheme.labelLarge,
@@ -427,6 +452,13 @@ class _DeviceCardState extends State<_DeviceCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final geometry =
+        theme.extension<AppThemeGeometry>() ??
+        const AppThemeGeometry(
+          cardRadius: 12,
+          controlRadius: 20,
+          dialogRadius: 28,
+        );
     final isSelected = widget.isSelected;
 
     return MouseRegion(
@@ -455,7 +487,7 @@ class _DeviceCardState extends State<_DeviceCard> {
                   : Colors.transparent,
               width: isSelected ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(geometry.cardRadius),
             boxShadow: [
               if (isSelected)
                 BoxShadow(

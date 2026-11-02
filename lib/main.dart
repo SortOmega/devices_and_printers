@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/localization/locale_provider.dart';
 import 'core/localization/locale_storage.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
+import 'core/theme/theme_storage.dart';
 import 'features/devices/data/repositories/system_device_repository.dart';
 import 'features/devices/presentation/view_models/device_list_view_model.dart';
 import 'features/devices/presentation/widgets/device_list_screen.dart';
@@ -16,14 +18,23 @@ Future<void> main() async {
   final localeProvider = LocaleProvider(
     SharedPreferencesLocaleStorage(preferences),
   );
+  final themeProvider = ThemeProvider(
+    SharedPreferencesThemeStorage(preferences),
+  );
   await localeProvider.initialize();
-  runApp(MyApp(localeProvider: localeProvider));
+  await themeProvider.initialize();
+  runApp(MyApp(localeProvider: localeProvider, themeProvider: themeProvider));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({required this.localeProvider, super.key});
+  const MyApp({
+    required this.localeProvider,
+    required this.themeProvider,
+    super.key,
+  });
 
   final LocaleProvider localeProvider;
+  final ThemeProvider themeProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +42,7 @@ class MyApp extends StatelessWidget {
       ..loadDevices();
 
     return AnimatedBuilder(
-      animation: localeProvider,
+      animation: Listenable.merge([localeProvider, themeProvider]),
       builder: (context, _) => MaterialApp(
         locale: localeProvider.locale,
         supportedLocales: LocaleProvider.supportedLocales,
@@ -42,12 +53,13 @@ class MyApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
+        theme: AppTheme.light(themeProvider.themeStyle),
+        darkTheme: AppTheme.dark(themeProvider.themeStyle),
         themeMode: ThemeMode.system,
         home: DeviceListScreen(
           viewModel: viewModel,
           localeProvider: localeProvider,
+          themeProvider: themeProvider,
         ),
       ),
     );
