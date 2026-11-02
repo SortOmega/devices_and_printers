@@ -15,7 +15,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  ThemeMode _colorMode = ThemeMode.system;
   String _interfaceSize = 'normal';
 
   @override
@@ -55,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             _SettingsDropdown<ThemeMode>(
               label: l10n.colorMode,
-              value: _colorMode,
+              value: widget.themeProvider?.colorMode,
               items: [
                 DropdownMenuItem(
                   value: ThemeMode.light,
@@ -67,9 +66,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Text(l10n.systemDefault),
                 ),
               ],
+              enabled: widget.themeProvider != null,
               onChanged: (value) {
                 if (value != null) {
-                  setState(() => _colorMode = value);
+                  widget.themeProvider?.setColorMode(value);
                 }
               },
             ),

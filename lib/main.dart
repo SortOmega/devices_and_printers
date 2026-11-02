@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
         onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
         theme: AppTheme.light(themeProvider.themeStyle),
         darkTheme: AppTheme.dark(themeProvider.themeStyle),
-        themeMode: ThemeMode.system,
+        themeMode: themeProvider.colorMode,
         home: DeviceListScreen(
           viewModel: viewModel,
           localeProvider: localeProvider,
