@@ -8,6 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/theme/theme_storage.dart';
 import 'features/devices/data/repositories/system_device_repository.dart';
+import 'features/devices/data/data_sources/network_device_scanner.dart';
 import 'features/devices/presentation/view_models/device_list_view_model.dart';
 import 'features/devices/presentation/widgets/windows/devices_window.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -38,8 +39,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = DeviceListViewModel(SystemDeviceRepository())
-      ..loadDevices();
+    final viewModel = DeviceListViewModel(
+      SystemDeviceRepository(),
+      SocketNetworkDeviceScanner(),
+    )..loadDevices();
 
     return AnimatedBuilder(
       animation: Listenable.merge([localeProvider, themeProvider]),

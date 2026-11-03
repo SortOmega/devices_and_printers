@@ -126,6 +126,7 @@ class SystemDeviceRepository implements DeviceRepository {
             : DeviceType.printer;
       }
     }
+
     return null;
   }
 
@@ -264,6 +265,7 @@ class SystemDeviceRepository implements DeviceRepository {
         section.add(line);
       }
     }
+
     addSection();
     return devices;
   }
