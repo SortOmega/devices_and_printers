@@ -37,6 +37,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get groupConnection => 'Agrupar: conexión';
 
   @override
+  String get groupDefault => 'Predeterminado';
+
+  @override
+  String get windowsDevices => 'Dispositivos';
+
+  @override
+  String get windowsPrinters => 'Impresoras y plotters';
+
+  @override
+  String get windowsUnknown => 'Dispositivos desconocidos';
+
+  @override
   String get addDevice => 'Añadir dispositivo';
 
   @override

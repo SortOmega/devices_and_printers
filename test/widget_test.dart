@@ -28,6 +28,33 @@ class FakeDeviceRepository implements DeviceRepository {
   ];
 }
 
+class WindowsGroupingRepository implements DeviceRepository {
+  @override
+  Future<List<Device>> getDevices() async => [
+    const Device(
+      id: 'monitor:windows',
+      name: 'Monitor',
+      type: DeviceType.monitor,
+      connection: DeviceConnection.usb,
+      status: DeviceStatus.active,
+    ),
+    const Device(
+      id: 'printer:windows',
+      name: 'Printer',
+      type: DeviceType.printer,
+      connection: DeviceConnection.network,
+      status: DeviceStatus.active,
+    ),
+    const Device(
+      id: 'unknown:windows',
+      name: 'Unknown',
+      type: DeviceType.unknown,
+      connection: DeviceConnection.unknown,
+      status: DeviceStatus.inactive,
+    ),
+  ];
+}
+
 Widget localizedApp(Widget home) {
   return MaterialApp(
     localizationsDelegates: const [
@@ -201,5 +228,38 @@ void main() {
     expect(find.text('Color mode'), findsOneWidget);
     expect(find.text('Interface size'), findsOneWidget);
     expect(find.text('Language'), findsNWidgets(2));
+  });
+
+  testWidgets('supports default device grouping with unknown devices last', (
+    WidgetTester tester,
+  ) async {
+    final viewModel = DeviceListViewModel(WindowsGroupingRepository())
+      ..loadDevices();
+
+    await tester.pumpWidget(
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Group: Type'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Default'));
+    await tester.pumpAndSettle();
+
+    final devicesFinder = find.text('Devices', skipOffstage: false);
+    final printersFinder = find.text(
+      'Printers and plotters',
+      skipOffstage: false,
+    );
+    final unknownFinder = find.text('Unknown devices', skipOffstage: false);
+    expect(devicesFinder, findsOneWidget);
+    expect(printersFinder, findsOneWidget);
+    expect(unknownFinder, findsOneWidget);
+
+    final devicesGroup = tester.getTopLeft(devicesFinder).dy;
+    final printersGroup = tester.getTopLeft(printersFinder).dy;
+    final unknownGroup = tester.getTopLeft(unknownFinder).dy;
+    expect(devicesGroup, lessThan(printersGroup));
+    expect(printersGroup, lessThan(unknownGroup));
   });
 }

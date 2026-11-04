@@ -85,6 +85,10 @@ class DevicesToolbar extends StatelessWidget {
                   value: 'connection',
                   child: Text(l10n.groupConnection),
                 ),
+                DropdownMenuItem(
+                  value: 'default',
+                  child: Text(l10n.groupDefault),
+                ),
               ],
             ),
             FilledButton.icon(

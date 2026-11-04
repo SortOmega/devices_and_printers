@@ -37,6 +37,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get groupConnection => 'Group: Connection';
 
   @override
+  String get groupDefault => 'Default';
+
+  @override
+  String get windowsDevices => 'Devices';
+
+  @override
+  String get windowsPrinters => 'Printers and plotters';
+
+  @override
+  String get windowsUnknown => 'Unknown devices';
+
+  @override
   String get addDevice => 'Add Device';
 
   @override

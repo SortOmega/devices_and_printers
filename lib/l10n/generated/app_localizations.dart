@@ -152,6 +152,30 @@ abstract class AppLocalizations {
   /// **'Group: Connection'**
   String get groupConnection;
 
+  /// No description provided for @groupDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get groupDefault;
+
+  /// No description provided for @windowsDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get windowsDevices;
+
+  /// No description provided for @windowsPrinters.
+  ///
+  /// In en, this message translates to:
+  /// **'Printers and plotters'**
+  String get windowsPrinters;
+
+  /// No description provided for @windowsUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown devices'**
+  String get windowsUnknown;
+
   /// No description provided for @addDevice.
   ///
   /// In en, this message translates to:

@@ -50,6 +50,11 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
     final l10n = AppLocalizations.of(context);
     final devices = [...widget.viewModel.devices]
       ..sort((first, second) {
+        final unknownOrder = _unknownDeviceOrder(first)
+            .compareTo(_unknownDeviceOrder(second));
+        if (unknownOrder != 0) {
+          return unknownOrder;
+        }
         return switch (_sortOption) {
           'status' => statusLabel(
             first.status,
@@ -67,11 +72,54 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
       final key = switch (_groupOption) {
         'status' => statusLabel(device.status, l10n),
         'connection' => connectionLabel(device.connection, l10n),
+        'default' => _defaultGroupLabel(device, l10n),
         _ => labelForType(device.type, l10n),
       };
       groups.putIfAbsent(key, () => []).add(device);
     }
-    return groups.entries.toList();
+    final entries = groups.entries.toList();
+    if (_groupOption == 'default') {
+      entries.sort(
+        (first, second) =>
+            _defaultGroupOrder(first.value.first)
+                .compareTo(_defaultGroupOrder(second.value.first)),
+      );
+    } else {
+      entries.sort((first, second) {
+        final firstUnknown = first.value.any(_isUnknownDevice);
+        final secondUnknown = second.value.any(_isUnknownDevice);
+        return firstUnknown == secondUnknown
+            ? 0
+            : firstUnknown
+            ? 1
+            : -1;
+      });
+    }
+    return entries;
+  }
+
+  int _unknownDeviceOrder(Device device) => _isUnknownDevice(device) ? 1 : 0;
+
+  bool _isUnknownDevice(Device device) => device.type == DeviceType.unknown;
+
+  int _defaultGroupOrder(Device device) {
+    if (_isUnknownDevice(device)) {
+      return 2;
+    }
+    if (device.isPrinter || device.type == DeviceType.plotter) {
+      return 1;
+    }
+    return 0;
+  }
+
+  String _defaultGroupLabel(Device device, AppLocalizations l10n) {
+    if (_isUnknownDevice(device)) {
+      return l10n.windowsUnknown;
+    }
+    if (device.isPrinter || device.type == DeviceType.plotter) {
+      return l10n.windowsPrinters;
+    }
+    return l10n.windowsDevices;
   }
 
   @override
