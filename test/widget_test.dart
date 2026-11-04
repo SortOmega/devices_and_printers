@@ -80,6 +80,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Default'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Type'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Monitors'), findsOneWidget);
     expect(find.text('Office Monitor'), findsOneWidget);
     expect(find.byIcon(Icons.monitor), findsOneWidget);
@@ -198,7 +203,7 @@ void main() {
     expect(find.text('Sort:'), findsOneWidget);
     expect(find.text('Name'), findsOneWidget);
     expect(find.text('Group:'), findsOneWidget);
-    expect(find.text('Type'), findsOneWidget);
+    expect(find.text('Default'), findsOneWidget);
 
     await tester.tap(find.text('Name'));
     await tester.pumpAndSettle();
@@ -206,7 +211,7 @@ void main() {
     await tester.tap(find.text('Status'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Type'));
+    await tester.tap(find.text('Default'));
     await tester.pumpAndSettle();
     expect(find.text('Status'), findsNWidgets(2));
   });
@@ -243,9 +248,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Type'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Default'));
     await tester.pumpAndSettle();
 
     final devicesFinder = find.text('Devices', skipOffstage: false);

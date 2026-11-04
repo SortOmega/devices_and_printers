@@ -32,7 +32,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
   final Set<String> _selectedDeviceIds = <String>{};
   String _activePage = 'devices';
   String _sortOption = 'name';
-  String _groupOption = 'type';
+  String _groupOption = 'default';
 
   void _toggleSelection(String deviceId) {
     setState(() {
