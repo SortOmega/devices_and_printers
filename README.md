@@ -27,6 +27,12 @@ The first implementation queries the Linux system and displays:
   protocol.
 - Connection information such as USB, Bluetooth, network, local, or unknown.
 - Operational status: active, inactive, or disconnected.
+- Selecting a device opens a responsive details panel. It shows the device
+  icon, name, provider when available, ID, type, status, connection, port,
+  source details, and other detected attributes. On compact screens it uses
+  the full screen; on desktop it appears on the right.
+- The details panel includes localized `Info` and `Config` tabs. Configuration
+  is intentionally marked as work in progress for now.
 - USB printers and plotters can be displayed even when no CUPS driver is
   configured, with their device identity marked as active or unknown.
 - Refresh through the toolbar or pull-to-refresh gesture.

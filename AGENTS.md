@@ -86,3 +86,13 @@ treated as proof that the application is not already running.
   solves the problem.
 - Before finishing, format changed Dart files and verify static analysis and
   tests.
+
+## Device Details Panel
+
+Selecting a device must open the responsive details panel implemented in
+`lib/features/devices/presentation/widgets/components/device_details_panel.dart`.
+Keep common typed attributes on the `Device` model (`id`, `name`, `vendor`,
+`type`, `status`, `connection`, and `connectionPort`) and place uncommon,
+source-specific values in `additionalDetails`. The `Info` tab is functional;
+the `Config` tab must remain visibly marked as work in progress until settings
+integration is implemented. All panel text must use the localized ARB files.
