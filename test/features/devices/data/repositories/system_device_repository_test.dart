@@ -57,6 +57,8 @@ void main() {
     expect(devices[0].connection, DeviceConnection.network);
     expect(devices[1].type, DeviceType.keyboard);
     expect(devices[1].status, DeviceStatus.active);
+    expect(devices[1].vendor, 'Example');
+    expect(devices[1].connectionPort, 'Bus 001 Device 002');
     expect(devices[2].type, DeviceType.headset);
     expect(devices[2].status, DeviceStatus.disconnected);
   });
@@ -116,6 +118,7 @@ void main() {
     expect(devices.single.type, DeviceType.plotter);
     expect(devices.single.status, DeviceStatus.active);
     expect(devices.single.connection, DeviceConnection.usb);
+    expect(devices.single.connectionPort, 'Bus 001 Device 004');
   });
 
   test('uses the configured CUPS printer for its USB identity', () async {

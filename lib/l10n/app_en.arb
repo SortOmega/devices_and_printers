@@ -81,5 +81,14 @@
   "unknownConnection": "Unknown connection",
   "active": "Active",
   "inactive": "Inactive",
-  "disconnected": "Disconnected"
+  "disconnected": "Disconnected",
+  "deviceInfoTab": "Info",
+  "deviceConfigTab": "Config",
+  "workInProgress": "Work in progress",
+  "deviceId": "Device ID",
+  "deviceType": "Device type",
+  "deviceStatus": "Status",
+  "deviceConnection": "Connection",
+  "devicePort": "Port",
+  "deviceDetails": "Details"
 }

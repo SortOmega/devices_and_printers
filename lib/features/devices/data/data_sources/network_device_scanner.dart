@@ -49,6 +49,8 @@ class SocketNetworkDeviceScanner implements NetworkDeviceScanner {
       connection: DeviceConnection.network,
       status: DeviceStatus.active,
       details: 'IP: $host; ports: ${openPorts.join(', ')}',
+      connectionPort: openPorts.join(', '),
+      vendor: name == host ? null : name.split(RegExp(r'[\s.-]')).first,
     );
   }
 

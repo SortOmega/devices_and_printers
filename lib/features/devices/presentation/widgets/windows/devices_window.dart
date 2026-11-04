@@ -7,6 +7,7 @@ import '../../../domain/models/device.dart';
 import '../../view_models/device_list_view_model.dart';
 import 'about_window.dart';
 import '../components/device_group.dart';
+import '../components/device_details_panel.dart';
 import '../components/device_labels.dart';
 import '../components/devices_toolbar.dart';
 import '../components/primary_navigation.dart';
@@ -44,6 +45,15 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
           ..add(deviceId);
       }
     });
+  }
+
+  Device? get _selectedDevice {
+    final selectedId = _selectedDeviceIds.firstOrNull;
+    if (selectedId == null) return null;
+    for (final device in widget.viewModel.devices) {
+      if (device.id == selectedId) return device;
+    }
+    return null;
   }
 
   List<MapEntry<String, List<Device>>> _deviceGroups() {
@@ -192,7 +202,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
       );
     }
 
-    return RefreshIndicator(
+    final deviceList = RefreshIndicator(
       onRefresh: widget.viewModel.loadDevices,
       child: ListView(
         padding: const EdgeInsets.all(16),
@@ -212,6 +222,31 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
             ),
         ],
       ),
+    );
+    final selectedDevice = _selectedDevice;
+    if (selectedDevice == null) return deviceList;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 600;
+        if (isCompact) {
+          return DeviceDetailsPanel(
+            device: selectedDevice,
+            onClose: () => setState(_selectedDeviceIds.clear),
+          );
+        }
+        return Row(
+          children: [
+            Expanded(child: deviceList),
+            SizedBox(
+              width: 360,
+              child: DeviceDetailsPanel(
+                device: selectedDevice,
+                onClose: () => setState(_selectedDeviceIds.clear),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -25,6 +25,9 @@ class Device {
     required this.connection,
     required this.status,
     this.details,
+    this.vendor,
+    this.connectionPort,
+    this.additionalDetails = const {},
   });
 
   final String id;
@@ -33,6 +36,9 @@ class Device {
   final DeviceConnection connection;
   final DeviceStatus status;
   final String? details;
+  final String? vendor;
+  final String? connectionPort;
+  final Map<String, String> additionalDetails;
 
   bool get isPrinter => type == DeviceType.printer;
 

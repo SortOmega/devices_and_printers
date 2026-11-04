@@ -66,6 +66,8 @@ class SystemDeviceRepository implements DeviceRepository {
               ? DeviceStatus.inactive
               : DeviceStatus.active,
           details: uri ?? description,
+          connectionPort: uri == null ? null : _connectionPort(uri),
+          vendor: _vendorFromUri(uri),
         ),
       );
     }
@@ -102,6 +104,8 @@ class SystemDeviceRepository implements DeviceRepository {
           connection: DeviceConnection.usb,
           status: DeviceStatus.active,
           details: trimmed,
+          vendor: _usbVendor(trimmed),
+          connectionPort: _usbLocation(trimmed),
         ),
       );
     }
@@ -183,6 +187,7 @@ class SystemDeviceRepository implements DeviceRepository {
                 ? DeviceStatus.active
                 : DeviceStatus.disconnected,
             details: id,
+            connectionPort: id,
           );
         })
         .toList();
@@ -253,6 +258,7 @@ class SystemDeviceRepository implements DeviceRepository {
           connection: DeviceConnection.audioJack,
           status: DeviceStatus.active,
           details: portName ?? portLine.trim(),
+          connectionPort: portName,
         ),
       );
     }
@@ -332,5 +338,29 @@ class SystemDeviceRepository implements DeviceRepository {
       return DeviceConnection.network;
     }
     return DeviceConnection.local;
+  }
+
+  String? _connectionPort(String uri) {
+    final scheme = uri.split(':').first;
+    return scheme.isEmpty ? null : scheme.toUpperCase();
+  }
+
+  String? _vendorFromUri(String? uri) {
+    if (uri == null) return null;
+    final value = uri.replaceFirst(RegExp(r'^[a-z]+://'), '');
+    final vendor = value.split(RegExp(r'[/?:]')).first.trim();
+    return vendor.isEmpty ? null : vendor;
+  }
+
+  String? _usbVendor(String line) {
+    final match = RegExp(r'\bID\s+\S+\s+(.+)$').firstMatch(line);
+    final name = match?.group(1)?.trim();
+    if (name == null || name.isEmpty) return null;
+    return name.split(RegExp(r'\s+')).first;
+  }
+
+  String? _usbLocation(String line) {
+    final match = RegExp(r'^(Bus\s+\S+\s+Device\s+\S+:?)').firstMatch(line);
+    return match?.group(1)?.replaceAll(':', '');
   }
 }

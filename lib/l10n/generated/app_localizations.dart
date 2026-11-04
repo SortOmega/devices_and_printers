@@ -487,6 +487,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Disconnected'**
   String get disconnected;
+
+  /// No description provided for @deviceInfoTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get deviceInfoTab;
+
+  /// No description provided for @deviceConfigTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Config'**
+  String get deviceConfigTab;
+
+  /// No description provided for @workInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Work in progress'**
+  String get workInProgress;
+
+  /// No description provided for @deviceId.
+  ///
+  /// In en, this message translates to:
+  /// **'Device ID'**
+  String get deviceId;
+
+  /// No description provided for @deviceType.
+  ///
+  /// In en, this message translates to:
+  /// **'Device type'**
+  String get deviceType;
+
+  /// No description provided for @deviceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get deviceStatus;
+
+  /// No description provided for @deviceConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection'**
+  String get deviceConnection;
+
+  /// No description provided for @devicePort.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get devicePort;
+
+  /// No description provided for @deviceDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get deviceDetails;
 }
 
 class _AppLocalizationsDelegate

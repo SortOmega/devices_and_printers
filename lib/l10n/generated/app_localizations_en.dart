@@ -211,4 +211,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get disconnected => 'Disconnected';
+
+  @override
+  String get deviceInfoTab => 'Info';
+
+  @override
+  String get deviceConfigTab => 'Config';
+
+  @override
+  String get workInProgress => 'Work in progress';
+
+  @override
+  String get deviceId => 'Device ID';
+
+  @override
+  String get deviceType => 'Device type';
+
+  @override
+  String get deviceStatus => 'Status';
+
+  @override
+  String get deviceConnection => 'Connection';
+
+  @override
+  String get devicePort => 'Port';
+
+  @override
+  String get deviceDetails => 'Details';
 }

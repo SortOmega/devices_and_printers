@@ -107,7 +107,7 @@ void main() {
     final initialDecoration = container.decoration! as BoxDecoration;
     expect(initialDecoration.border!.top.color, Colors.transparent);
 
-    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.drag(find.byType(ListView).first, const Offset(0, -300));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Office Monitor'));
     await tester.pumpAndSettle();
@@ -115,6 +115,30 @@ void main() {
     container = tester.widget(card);
     final selectedDecoration = container.decoration! as BoxDecoration;
     expect(selectedDecoration.border!.top.color, isNot(Colors.transparent));
+  });
+
+  testWidgets('shows device details and a work-in-progress config tab', (
+    WidgetTester tester,
+  ) async {
+    final viewModel = DeviceListViewModel(_DetailsRepository())..loadDevices();
+
+    await tester.pumpWidget(
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Detailed Monitor'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Device ID'), findsOneWidget);
+    expect(find.text('monitor:detailed'), findsOneWidget);
+    expect(find.text('Acme'), findsOneWidget);
+    await tester.drag(find.byType(ListView).last, const Offset(0, -250));
+    await tester.pumpAndSettle();
+    expect(find.text('DisplayPort'), findsOneWidget);
+
+    await tester.tap(find.text('Config'));
+    await tester.pumpAndSettle();
+    expect(find.text('Work in progress'), findsOneWidget);
   });
 
   testWidgets('keeps only one card selected at a time', (
@@ -128,11 +152,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.drag(find.byType(ListView).first, const Offset(0, -300));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Office Monitor'));
     await tester.pumpAndSettle();
-    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.drag(find.byType(ListView).first, const Offset(0, -300));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Office Keyboard'));
     await tester.pumpAndSettle();
@@ -267,4 +291,19 @@ void main() {
     expect(devicesGroup, lessThan(printersGroup));
     expect(printersGroup, lessThan(unknownGroup));
   });
+}
+
+class _DetailsRepository implements DeviceRepository {
+  @override
+  Future<List<Device>> getDevices() async => [
+    const Device(
+      id: 'monitor:detailed',
+      name: 'Detailed Monitor',
+      vendor: 'Acme',
+      type: DeviceType.monitor,
+      connection: DeviceConnection.usb,
+      connectionPort: 'DisplayPort',
+      status: DeviceStatus.active,
+    ),
+  ];
 }
