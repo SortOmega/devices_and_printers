@@ -116,40 +116,52 @@ abstract class AppLocalizations {
   /// **'About'**
   String get about;
 
+  /// No description provided for @sortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort:'**
+  String get sortLabel;
+
   /// No description provided for @sortName.
   ///
   /// In en, this message translates to:
-  /// **'Sort: Name'**
+  /// **'Name'**
   String get sortName;
 
   /// No description provided for @sortStatus.
   ///
   /// In en, this message translates to:
-  /// **'Sort: Status'**
+  /// **'Status'**
   String get sortStatus;
 
   /// No description provided for @sortConnection.
   ///
   /// In en, this message translates to:
-  /// **'Sort: Connection'**
+  /// **'Connection'**
   String get sortConnection;
+
+  /// No description provided for @groupLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Group:'**
+  String get groupLabel;
 
   /// No description provided for @groupType.
   ///
   /// In en, this message translates to:
-  /// **'Group: Type'**
+  /// **'Type'**
   String get groupType;
 
   /// No description provided for @groupStatus.
   ///
   /// In en, this message translates to:
-  /// **'Group: Status'**
+  /// **'Status'**
   String get groupStatus;
 
   /// No description provided for @groupConnection.
   ///
   /// In en, this message translates to:
-  /// **'Group: Connection'**
+  /// **'Connection'**
   String get groupConnection;
 
   /// No description provided for @groupDefault.

@@ -195,18 +195,20 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Sort: Name'), findsOneWidget);
-    expect(find.text('Group: Type'), findsOneWidget);
+    expect(find.text('Sort:'), findsOneWidget);
+    expect(find.text('Name'), findsOneWidget);
+    expect(find.text('Group:'), findsOneWidget);
+    expect(find.text('Type'), findsOneWidget);
 
-    await tester.tap(find.text('Sort: Name'));
+    await tester.tap(find.text('Name'));
     await tester.pumpAndSettle();
-    expect(find.text('Sort: Status'), findsOneWidget);
-    await tester.tap(find.text('Sort: Status'));
+    expect(find.text('Status'), findsOneWidget);
+    await tester.tap(find.text('Status'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Group: Type'));
+    await tester.tap(find.text('Type'));
     await tester.pumpAndSettle();
-    expect(find.text('Group: Status'), findsOneWidget);
+    expect(find.text('Status'), findsNWidgets(2));
   });
 
   testWidgets('shows appearance and language settings', (
@@ -241,7 +243,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Group: Type'));
+    await tester.tap(find.text('Type'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Default'));
     await tester.pumpAndSettle();

@@ -42,6 +42,7 @@ class DevicesToolbar extends StatelessWidget {
           runSpacing: 4,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
+            Text(l10n.sortLabel),
             DropdownButton<String>(
               value: sortOption,
               isDense: true,
@@ -63,6 +64,7 @@ class DevicesToolbar extends StatelessWidget {
                 ),
               ],
             ),
+            Text(l10n.groupLabel),
             DropdownButton<String>(
               value: groupOption,
               isDense: true,

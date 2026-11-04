@@ -19,22 +19,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
-  String get sortName => 'Sort: Name';
+  String get sortLabel => 'Sort:';
 
   @override
-  String get sortStatus => 'Sort: Status';
+  String get sortName => 'Name';
 
   @override
-  String get sortConnection => 'Sort: Connection';
+  String get sortStatus => 'Status';
 
   @override
-  String get groupType => 'Group: Type';
+  String get sortConnection => 'Connection';
 
   @override
-  String get groupStatus => 'Group: Status';
+  String get groupLabel => 'Group:';
 
   @override
-  String get groupConnection => 'Group: Connection';
+  String get groupType => 'Type';
+
+  @override
+  String get groupStatus => 'Status';
+
+  @override
+  String get groupConnection => 'Connection';
 
   @override
   String get groupDefault => 'Default';
