@@ -8,6 +8,10 @@ abstract interface class ThemeStorage {
   Future<String?> readColorMode();
 
   Future<void> writeColorMode(String colorMode);
+
+  Future<String?> readInterfaceSize();
+
+  Future<void> writeInterfaceSize(String interfaceSize);
 }
 
 class SharedPreferencesThemeStorage implements ThemeStorage {
@@ -16,6 +20,7 @@ class SharedPreferencesThemeStorage implements ThemeStorage {
   final SharedPreferences _preferences;
   static const _themeKey = 'theme';
   static const _colorModeKey = 'colorMode';
+  static const _interfaceSizeKey = 'interfaceSize';
 
   @override
   Future<String?> readTheme() async => _preferences.getString(_themeKey);
@@ -32,5 +37,14 @@ class SharedPreferencesThemeStorage implements ThemeStorage {
   @override
   Future<void> writeColorMode(String colorMode) async {
     await _preferences.setString(_colorModeKey, colorMode);
+  }
+
+  @override
+  Future<String?> readInterfaceSize() async =>
+      _preferences.getString(_interfaceSizeKey);
+
+  @override
+  Future<void> writeInterfaceSize(String interfaceSize) async {
+    await _preferences.setString(_interfaceSizeKey, interfaceSize);
   }
 }

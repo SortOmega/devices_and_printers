@@ -15,8 +15,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String _interfaceSize = 'normal';
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -73,26 +71,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 }
               },
             ),
-            _SettingsDropdown<String>(
+            _SettingsDropdown<AppInterfaceSize>(
               label: l10n.interfaceSize,
-              value: _interfaceSize,
+              value: widget.themeProvider?.interfaceSize,
               items: [
                 DropdownMenuItem(
-                  value: 'large',
+                  value: AppInterfaceSize.large,
                   child: Text(l10n.interfaceSizeLarge),
                 ),
                 DropdownMenuItem(
-                  value: 'normal',
+                  value: AppInterfaceSize.normal,
                   child: Text(l10n.interfaceSizeNormal),
                 ),
                 DropdownMenuItem(
-                  value: 'compact',
+                  value: AppInterfaceSize.compact,
                   child: Text(l10n.interfaceSizeCompact),
                 ),
               ],
+              enabled: widget.themeProvider != null,
               onChanged: (value) {
                 if (value != null) {
-                  setState(() => _interfaceSize = value);
+                  widget.themeProvider?.setInterfaceSize(value);
                 }
               },
             ),

@@ -14,11 +14,37 @@ void main() {
 
       expect(light.brightness, Brightness.light);
       expect(dark.brightness, Brightness.dark);
+      expect(
+        dark.textTheme.bodyMedium?.color?.computeLuminance(),
+        greaterThan(light.textTheme.bodyMedium?.color?.computeLuminance() ?? 0),
+      );
       expect(light.filledButtonTheme.style, isNotNull);
       expect(light.outlinedButtonTheme.style, isNotNull);
       expect(light.inputDecorationTheme.border, isNotNull);
       expect(lightGeometry.controlRadius, greaterThan(0));
       expect(darkGeometry.controlRadius, lightGeometry.controlRadius);
     }
+
+    expect(
+      AppTheme.light(
+            AppThemeStyle.material,
+            AppInterfaceSize.large,
+          ).textTheme.titleLarge?.fontSize ??
+          0,
+      greaterThan(
+        AppTheme.light(
+              AppThemeStyle.material,
+              AppInterfaceSize.normal,
+            ).textTheme.titleLarge?.fontSize ??
+            0,
+      ),
+    );
+    expect(
+      AppTheme.light(
+        AppThemeStyle.material,
+        AppInterfaceSize.compact,
+      ).visualDensity,
+      VisualDensity.compact,
+    );
   });
 }

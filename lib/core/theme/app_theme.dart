@@ -3,15 +3,25 @@ import 'package:flutter/material.dart';
 import 'theme_provider.dart';
 
 abstract final class AppTheme {
-  static ThemeData light(AppThemeStyle style) {
-    return _theme(style, Brightness.light);
+  static ThemeData light(
+    AppThemeStyle style, [
+    AppInterfaceSize interfaceSize = AppInterfaceSize.normal,
+  ]) {
+    return _theme(style, Brightness.light, interfaceSize);
   }
 
-  static ThemeData dark(AppThemeStyle style) {
-    return _theme(style, Brightness.dark);
+  static ThemeData dark(
+    AppThemeStyle style, [
+    AppInterfaceSize interfaceSize = AppInterfaceSize.normal,
+  ]) {
+    return _theme(style, Brightness.dark, interfaceSize);
   }
 
-  static ThemeData _theme(AppThemeStyle style, Brightness brightness) {
+  static ThemeData _theme(
+    AppThemeStyle style,
+    Brightness brightness,
+    AppInterfaceSize interfaceSize,
+  ) {
     final geometry = _geometry(style);
     final colorScheme = ColorScheme.fromSeed(
       seedColor: switch (style) {
@@ -25,6 +35,8 @@ abstract final class AppTheme {
       colorScheme: colorScheme,
       brightness: brightness,
       useMaterial3: true,
+      visualDensity: _visualDensity(interfaceSize),
+      textTheme: _textTheme(interfaceSize, brightness),
       scaffoldBackgroundColor: colorScheme.surface,
       extensions: [geometry],
       cardTheme: CardThemeData(
@@ -129,6 +141,49 @@ abstract final class AppTheme {
       AppThemeStyle.cupertino => base,
       AppThemeStyle.fluent => base,
     };
+  }
+
+  static VisualDensity _visualDensity(AppInterfaceSize size) {
+    return switch (size) {
+      AppInterfaceSize.large => VisualDensity.comfortable,
+      AppInterfaceSize.normal => VisualDensity.standard,
+      AppInterfaceSize.compact => VisualDensity.compact,
+    };
+  }
+
+  static TextTheme _textTheme(AppInterfaceSize size, Brightness brightness) {
+    final double factor = switch (size) {
+      AppInterfaceSize.large => 1.15,
+      AppInterfaceSize.normal => 1.0,
+      AppInterfaceSize.compact => 0.9,
+    };
+    final textTheme = ThemeData(
+      brightness: brightness,
+      useMaterial3: true,
+    ).textTheme;
+    TextStyle scale(TextStyle? style, double defaultSize) {
+      return (style ?? const TextStyle()).copyWith(
+        fontSize: (style?.fontSize ?? defaultSize) * factor,
+      );
+    }
+
+    return textTheme.copyWith(
+      displayLarge: scale(textTheme.displayLarge, 57),
+      displayMedium: scale(textTheme.displayMedium, 45),
+      displaySmall: scale(textTheme.displaySmall, 36),
+      headlineLarge: scale(textTheme.headlineLarge, 32),
+      headlineMedium: scale(textTheme.headlineMedium, 28),
+      headlineSmall: scale(textTheme.headlineSmall, 24),
+      titleLarge: scale(textTheme.titleLarge, 22),
+      titleMedium: scale(textTheme.titleMedium, 16),
+      titleSmall: scale(textTheme.titleSmall, 14),
+      bodyLarge: scale(textTheme.bodyLarge, 16),
+      bodyMedium: scale(textTheme.bodyMedium, 14),
+      bodySmall: scale(textTheme.bodySmall, 12),
+      labelLarge: scale(textTheme.labelLarge, 14),
+      labelMedium: scale(textTheme.labelMedium, 12),
+      labelSmall: scale(textTheme.labelSmall, 11),
+    );
   }
 
   static AppThemeGeometry _geometry(AppThemeStyle style) {

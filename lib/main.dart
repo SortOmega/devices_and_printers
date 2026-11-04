@@ -56,8 +56,14 @@ class MyApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-        theme: AppTheme.light(themeProvider.themeStyle),
-        darkTheme: AppTheme.dark(themeProvider.themeStyle),
+        theme: AppTheme.light(
+          themeProvider.themeStyle,
+          themeProvider.interfaceSize,
+        ),
+        darkTheme: AppTheme.dark(
+          themeProvider.themeStyle,
+          themeProvider.interfaceSize,
+        ),
         themeMode: themeProvider.colorMode,
         home: DeviceListScreen(
           viewModel: viewModel,

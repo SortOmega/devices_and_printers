@@ -9,6 +9,7 @@ class FakeThemeStorage implements ThemeStorage {
 
   String? value;
   String? colorMode;
+  String? interfaceSize;
 
   @override
   Future<String?> readTheme() async => value;
@@ -21,6 +22,12 @@ class FakeThemeStorage implements ThemeStorage {
 
   @override
   Future<void> writeColorMode(String value) async => colorMode = value;
+
+  @override
+  Future<String?> readInterfaceSize() async => interfaceSize;
+
+  @override
+  Future<void> writeInterfaceSize(String value) async => interfaceSize = value;
 }
 
 void main() {
@@ -69,5 +76,18 @@ void main() {
 
     expect(provider.colorMode, ThemeMode.light);
     expect(storage.colorMode, 'light');
+  });
+
+  test('loads and persists the selected interface size', () async {
+    final storage = FakeThemeStorage()..interfaceSize = 'compact';
+    final provider = ThemeProvider(storage);
+    await provider.initialize();
+
+    expect(provider.interfaceSize, AppInterfaceSize.compact);
+
+    await provider.setInterfaceSize(AppInterfaceSize.large);
+
+    expect(provider.interfaceSize, AppInterfaceSize.large);
+    expect(storage.interfaceSize, 'large');
   });
 }
