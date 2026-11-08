@@ -74,11 +74,94 @@ void main() {
         status: DeviceStatus.active,
       ),
     ]);
-    await Future<void>.delayed(Duration.zero);
+    await Future<void>.delayed(const Duration(milliseconds: 10));
 
     expect(viewModel.devices, hasLength(2));
     expect(viewModel.devices.last.name, 'Ejet-1902');
     expect(viewModel.isScanningNetwork, isFalse);
+  });
+
+  test(
+    'refreshes only network devices and removes devices no longer found',
+    () async {
+      final firstScan = Completer<List<Device>>();
+      final secondScan = Completer<List<Device>>();
+      final scanner = QueuedNetworkDeviceScanner([
+        firstScan.future,
+        secondScan.future,
+      ]);
+      final viewModel = DeviceListViewModel(
+        FakeDeviceRepository(const [
+          Device(
+            id: 'usb:one',
+            name: 'Keyboard',
+            type: DeviceType.keyboard,
+            connection: DeviceConnection.usb,
+            status: DeviceStatus.active,
+          ),
+        ]),
+        scanner,
+      );
+
+      await viewModel.loadDevices();
+      firstScan.complete(const [
+        Device(
+          id: 'network:old',
+          name: 'Old router',
+          type: DeviceType.router,
+          connection: DeviceConnection.network,
+          status: DeviceStatus.active,
+        ),
+      ]);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      unawaited(viewModel.refreshNetwork());
+      expect(viewModel.devices, hasLength(2));
+      secondScan.complete(const [
+        Device(
+          id: 'network:new',
+          name: 'New router',
+          type: DeviceType.router,
+          connection: DeviceConnection.network,
+          status: DeviceStatus.active,
+        ),
+      ]);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      expect(viewModel.devices.map((device) => device.id), contains('usb:one'));
+      expect(
+        viewModel.devices.map((device) => device.id),
+        contains('network:new'),
+      );
+      expect(
+        viewModel.devices.map((device) => device.id),
+        isNot(contains('network:old')),
+      );
+    },
+  );
+
+  test('cancelling a network refresh keeps existing devices', () async {
+    final scan = Completer<List<Device>>();
+    final viewModel = DeviceListViewModel(
+      FakeDeviceRepository(const [
+        Device(
+          id: 'network:existing',
+          name: 'Existing router',
+          type: DeviceType.router,
+          connection: DeviceConnection.network,
+          status: DeviceStatus.active,
+        ),
+      ]),
+      FakeNetworkDeviceScanner(scan.future),
+    );
+
+    await viewModel.loadDevices();
+    viewModel.cancelNetworkScan();
+    scan.complete(const []);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(viewModel.isScanningNetwork, isFalse);
+    expect(viewModel.devices.single.id, 'network:existing');
   });
 }
 
@@ -89,4 +172,14 @@ class FakeNetworkDeviceScanner implements NetworkDeviceScanner {
 
   @override
   Future<List<Device>> scan() => result;
+}
+
+class QueuedNetworkDeviceScanner implements NetworkDeviceScanner {
+  QueuedNetworkDeviceScanner(this.results);
+
+  final List<Future<List<Device>>> results;
+  var _index = 0;
+
+  @override
+  Future<List<Device>> scan() => results[_index++];
 }

@@ -577,6 +577,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Network search failed: {error}'**
   String networkScanFailed(Object error);
+
+  /// No description provided for @refreshNetworkDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Search network devices'**
+  String get refreshNetworkDevices;
+
+  /// No description provided for @cancelNetworkScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel network search'**
+  String get cancelNetworkScan;
+
+  /// No description provided for @networkSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Network discovery'**
+  String get networkSettings;
+
+  /// No description provided for @automaticNetworkSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search automatically'**
+  String get automaticNetworkSearch;
+
+  /// No description provided for @automaticNetworkSearchDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for network devices at startup and every minute.'**
+  String get automaticNetworkSearchDescription;
 }
 
 class _AppLocalizationsDelegate

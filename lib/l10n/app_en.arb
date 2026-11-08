@@ -101,5 +101,10 @@
     "placeholders": {
       "error": {}
     }
-  }
+  },
+  "refreshNetworkDevices": "Search network devices",
+  "cancelNetworkScan": "Cancel network search",
+  "networkSettings": "Network discovery",
+  "automaticNetworkSearch": "Search automatically",
+  "automaticNetworkSearchDescription": "Search for network devices at startup and every minute."
 }

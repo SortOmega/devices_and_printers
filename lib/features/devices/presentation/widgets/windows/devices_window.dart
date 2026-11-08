@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/localization/locale_provider.dart';
 import '../../../../../core/theme/theme_provider.dart';
+import '../../../../../core/network/network_scan_settings.dart';
 import '../../../../../l10n/generated/app_localizations.dart';
 import '../../../domain/models/device.dart';
 import '../../view_models/device_list_view_model.dart';
@@ -19,12 +20,14 @@ class DeviceListScreen extends StatefulWidget {
     required this.viewModel,
     this.localeProvider,
     this.themeProvider,
+    this.networkSettings,
     super.key,
   });
 
   final DeviceListViewModel viewModel;
   final LocaleProvider? localeProvider;
   final ThemeProvider? themeProvider;
+  final NetworkScanSettings? networkSettings;
 
   @override
   State<DeviceListScreen> createState() => _DeviceListScreenState();
@@ -153,6 +156,8 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
                 onAddDevice: () => _showAddDialog(context, 'device'),
                 onAddPrinter: () => _showAddDialog(context, 'printer'),
                 onRefresh: widget.viewModel.loadDevices,
+                onRefreshNetwork: widget.viewModel.refreshNetwork,
+                isScanningNetwork: widget.viewModel.isScanningNetwork,
               ),
             Expanded(child: _buildPage(context)),
           ],
@@ -160,6 +165,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
         bottomNavigationBar: _activePage == 'devices'
             ? AsyncOperationFooter(
                 isRunning: widget.viewModel.isScanningNetwork,
+                onCancel: widget.viewModel.cancelNetworkScan,
                 errorMessage: widget.viewModel.networkErrorMessage,
               )
             : null,
@@ -173,6 +179,7 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
       'settings' => SettingsScreen(
         localeProvider: widget.localeProvider,
         themeProvider: widget.themeProvider,
+        networkSettings: widget.networkSettings,
       ),
       _ => const AboutPage(),
     };

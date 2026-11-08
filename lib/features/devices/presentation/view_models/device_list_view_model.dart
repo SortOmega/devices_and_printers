@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/network/network_scan_settings.dart';
 import '../../data/data_sources/network_device_scanner.dart';
 import '../../domain/models/device.dart';
 import '../../domain/repositories/device_repository.dart';
@@ -9,23 +10,33 @@ import '../../domain/repositories/device_repository.dart';
 enum DeviceListStatus { initial, loading, loaded, error }
 
 class DeviceListViewModel extends ChangeNotifier {
-  DeviceListViewModel(this._repository, [this._networkScanner]);
+  DeviceListViewModel(
+    this._repository, [
+    this._networkScanner,
+    this._networkSettings,
+  ]) {
+    _networkSettings?.addListener(_networkSettingsChanged);
+    _networkSettingsChanged();
+  }
 
   final DeviceRepository _repository;
   final NetworkDeviceScanner? _networkScanner;
+  final NetworkScanSettings? _networkSettings;
   DeviceListStatus status = DeviceListStatus.initial;
   List<Device> devices = const [];
   String? errorMessage;
   String? networkErrorMessage;
   bool isScanningNetwork = false;
-  int _loadGeneration = 0;
+  Timer? _automaticScanTimer;
+  int _networkScanGeneration = 0;
+
+  bool get canScanNetwork => _networkScanner != null;
 
   Future<void> loadDevices() async {
-    final loadGeneration = ++_loadGeneration;
+    cancelNetworkScan();
     status = DeviceListStatus.loading;
     errorMessage = null;
     networkErrorMessage = null;
-    isScanningNetwork = false;
     notifyListeners();
     try {
       devices = await _repository.getDevices();
@@ -35,35 +46,69 @@ class DeviceListViewModel extends ChangeNotifier {
       errorMessage = error.toString();
     }
     notifyListeners();
-    if (status == DeviceListStatus.loaded && _networkScanner != null) {
-      unawaited(_scanNetwork(loadGeneration));
+    if (status == DeviceListStatus.loaded &&
+        _networkSettings?.automaticScan != false) {
+      refreshNetwork();
     }
   }
 
-  Future<void> _scanNetwork(int loadGeneration) async {
+  Future<void> refreshNetwork() async {
+    if (_networkScanner == null || isScanningNetwork) return;
+    final scanGeneration = ++_networkScanGeneration;
     isScanningNetwork = true;
+    networkErrorMessage = null;
     notifyListeners();
     try {
-      final networkDevices = await _networkScanner!.scan();
-      if (loadGeneration != _loadGeneration) {
+      final networkDevices = await _networkScanner.scan();
+      if (scanGeneration != _networkScanGeneration) {
         return;
       }
-      final knownIds = devices.map((device) => device.id).toSet();
-      devices = [
-        ...devices,
-        ...networkDevices.where((device) => knownIds.add(device.id)),
-      ];
+      final nonNetworkDevices = devices
+          .where((device) => device.connection != DeviceConnection.network)
+          .toList();
+      devices = [...nonNetworkDevices, ...networkDevices];
     } catch (error) {
-      if (loadGeneration != _loadGeneration) {
+      if (scanGeneration != _networkScanGeneration) {
         return;
       }
       networkErrorMessage = error.toString();
     } finally {
-      if (loadGeneration == _loadGeneration) {
+      if (scanGeneration == _networkScanGeneration) {
         isScanningNetwork = false;
         notifyListeners();
       }
     }
+  }
+
+  void cancelNetworkScan() {
+    if (!isScanningNetwork) return;
+    _networkScanGeneration++;
+    isScanningNetwork = false;
+    notifyListeners();
+  }
+
+  void _networkSettingsChanged() {
+    _automaticScanTimer?.cancel();
+    _automaticScanTimer = null;
+    if (_networkSettings?.automaticScan == true) {
+      _automaticScanTimer = Timer.periodic(
+        const Duration(minutes: 1),
+        (_) => refreshNetwork(),
+      );
+      if (status == DeviceListStatus.loaded) {
+        unawaited(refreshNetwork());
+      }
+    } else {
+      cancelNetworkScan();
+    }
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _automaticScanTimer?.cancel();
+    _networkSettings?.removeListener(_networkSettingsChanged);
+    super.dispose();
   }
 
   Map<DeviceType, List<Device>> get groupedDevices {

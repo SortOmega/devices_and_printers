@@ -5,11 +5,13 @@ import '../../../../../l10n/generated/app_localizations.dart';
 class AsyncOperationFooter extends StatelessWidget {
   const AsyncOperationFooter({
     required this.isRunning,
+    required this.onCancel,
     this.errorMessage,
     super.key,
   });
 
   final bool isRunning;
+  final VoidCallback onCancel;
   final String? errorMessage;
 
   @override
@@ -53,7 +55,11 @@ class AsyncOperationFooter extends StatelessWidget {
                 ),
               ),
               if (isRunning)
-                Icon(Icons.lan, size: 20, color: theme.colorScheme.primary),
+                IconButton(
+                  onPressed: onCancel,
+                  tooltip: l10n.cancelNetworkScan,
+                  icon: const Icon(Icons.cancel_outlined),
+                ),
             ],
           ),
         ),

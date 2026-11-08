@@ -258,4 +258,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String networkScanFailed(Object error) {
     return 'Network search failed: $error';
   }
+
+  @override
+  String get refreshNetworkDevices => 'Search network devices';
+
+  @override
+  String get cancelNetworkScan => 'Cancel network search';
+
+  @override
+  String get networkSettings => 'Network discovery';
+
+  @override
+  String get automaticNetworkSearch => 'Search automatically';
+
+  @override
+  String get automaticNetworkSearchDescription =>
+      'Search for network devices at startup and every minute.';
 }

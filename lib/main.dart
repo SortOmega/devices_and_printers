@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/localization/locale_provider.dart';
 import 'core/localization/locale_storage.dart';
+import 'core/network/network_scan_settings.dart';
+import 'core/network/shared_preferences_network_scan_settings_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/theme/theme_storage.dart';
@@ -22,26 +24,39 @@ Future<void> main() async {
   final themeProvider = ThemeProvider(
     SharedPreferencesThemeStorage(preferences),
   );
+  final networkSettings = NetworkScanSettings(
+    SharedPreferencesNetworkScanSettingsStorage(preferences),
+  );
   await localeProvider.initialize();
   await themeProvider.initialize();
-  runApp(MyApp(localeProvider: localeProvider, themeProvider: themeProvider));
+  await networkSettings.initialize();
+  runApp(
+    MyApp(
+      localeProvider: localeProvider,
+      themeProvider: themeProvider,
+      networkSettings: networkSettings,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({
     required this.localeProvider,
     required this.themeProvider,
+    required this.networkSettings,
     super.key,
   });
 
   final LocaleProvider localeProvider;
   final ThemeProvider themeProvider;
+  final NetworkScanSettings networkSettings;
 
   @override
   Widget build(BuildContext context) {
     final viewModel = DeviceListViewModel(
       SystemDeviceRepository(),
       SocketNetworkDeviceScanner(),
+      networkSettings,
     )..loadDevices();
 
     return AnimatedBuilder(
@@ -69,6 +84,7 @@ class MyApp extends StatelessWidget {
           viewModel: viewModel,
           localeProvider: localeProvider,
           themeProvider: themeProvider,
+          networkSettings: networkSettings,
         ),
       ),
     );

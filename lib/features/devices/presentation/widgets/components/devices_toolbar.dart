@@ -12,6 +12,8 @@ class DevicesToolbar extends StatelessWidget {
     required this.onAddDevice,
     required this.onAddPrinter,
     required this.onRefresh,
+    required this.onRefreshNetwork,
+    required this.isScanningNetwork,
     super.key,
   });
 
@@ -22,6 +24,8 @@ class DevicesToolbar extends StatelessWidget {
   final VoidCallback onAddDevice;
   final VoidCallback onAddPrinter;
   final VoidCallback onRefresh;
+  final VoidCallback onRefreshNetwork;
+  final bool isScanningNetwork;
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +111,11 @@ class DevicesToolbar extends StatelessWidget {
               onPressed: onRefresh,
               tooltip: l10n.refreshDevices,
               icon: const Icon(Icons.refresh),
+            ),
+            IconButton(
+              onPressed: isScanningNetwork ? null : onRefreshNetwork,
+              tooltip: l10n.refreshNetworkDevices,
+              icon: const Icon(Icons.lan),
             ),
           ],
         ),

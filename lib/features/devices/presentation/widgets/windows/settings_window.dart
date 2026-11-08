@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/localization/locale_provider.dart';
 import '../../../../../core/theme/theme_provider.dart';
+import '../../../../../core/network/network_scan_settings.dart';
 import '../../../../../l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({this.localeProvider, this.themeProvider, super.key});
+  const SettingsScreen({
+    this.localeProvider,
+    this.themeProvider,
+    this.networkSettings,
+    super.key,
+  });
 
   final LocaleProvider? localeProvider;
   final ThemeProvider? themeProvider;
+  final NetworkScanSettings? networkSettings;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -95,6 +102,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 }
               },
             ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _SettingsSection(
+          title: l10n.networkSettings,
+          children: [
+            if (widget.networkSettings != null)
+              AnimatedBuilder(
+                animation: widget.networkSettings!,
+                builder: (context, _) => SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.automaticNetworkSearch),
+                  subtitle: Text(l10n.automaticNetworkSearchDescription),
+                  value: widget.networkSettings!.automaticScan,
+                  onChanged: widget.networkSettings!.setAutomaticScan,
+                ),
+              ),
           ],
         ),
         const SizedBox(height: 16),
