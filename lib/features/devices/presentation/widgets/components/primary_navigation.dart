@@ -20,9 +20,10 @@ class PrimaryNavigation extends StatelessWidget {
       elevation: 1,
       child: SafeArea(
         bottom: false,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Center(
             child: SegmentedButton<String>(
               style: const ButtonStyle(
                 visualDensity: VisualDensity.compact,
