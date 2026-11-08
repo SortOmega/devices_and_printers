@@ -163,6 +163,40 @@ void main() {
     expect(viewModel.isScanningNetwork, isFalse);
     expect(viewModel.devices.single.id, 'network:existing');
   });
+
+  test(
+    'detects local device changes without replacing network devices',
+    () async {
+      final repository = FakeDeviceRepository([
+        const Device(
+          id: 'audio:headset',
+          name: 'Headset',
+          type: DeviceType.headset,
+          connection: DeviceConnection.audioJack,
+          status: DeviceStatus.active,
+        ),
+      ]);
+      final viewModel = DeviceListViewModel(
+        repository,
+        null,
+        null,
+        const Duration(milliseconds: 5),
+      );
+
+      await viewModel.loadDevices();
+      repository.devices[0] = const Device(
+        id: 'audio:headset',
+        name: 'Headset',
+        type: DeviceType.headset,
+        connection: DeviceConnection.audioJack,
+        status: DeviceStatus.disconnected,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      expect(viewModel.devices.single.status, DeviceStatus.disconnected);
+      viewModel.dispose();
+    },
+  );
 }
 
 class FakeNetworkDeviceScanner implements NetworkDeviceScanner {

@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
       SystemDeviceRepository(),
       SocketNetworkDeviceScanner(),
       networkSettings,
+      const Duration(seconds: 1),
     )..loadDevices();
 
     return AnimatedBuilder(

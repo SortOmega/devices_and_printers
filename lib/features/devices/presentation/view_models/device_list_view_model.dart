@@ -14,6 +14,7 @@ class DeviceListViewModel extends ChangeNotifier {
     this._repository, [
     this._networkScanner,
     this._networkSettings,
+    this._localRefreshInterval,
   ]) {
     _networkSettings?.addListener(_networkSettingsChanged);
     _networkSettingsChanged();
@@ -22,12 +23,15 @@ class DeviceListViewModel extends ChangeNotifier {
   final DeviceRepository _repository;
   final NetworkDeviceScanner? _networkScanner;
   final NetworkScanSettings? _networkSettings;
+  final Duration? _localRefreshInterval;
   DeviceListStatus status = DeviceListStatus.initial;
   List<Device> devices = const [];
   String? errorMessage;
   String? networkErrorMessage;
   bool isScanningNetwork = false;
   Timer? _automaticScanTimer;
+  Timer? _localRefreshTimer;
+  bool _isRefreshingLocalDevices = false;
   int _networkScanGeneration = 0;
 
   bool get canScanNetwork => _networkScanner != null;
@@ -46,10 +50,87 @@ class DeviceListViewModel extends ChangeNotifier {
       errorMessage = error.toString();
     }
     notifyListeners();
+    if (status == DeviceListStatus.loaded) {
+      _startLocalMonitoring();
+    }
     if (status == DeviceListStatus.loaded &&
         _networkSettings?.automaticScan != false) {
       refreshNetwork();
     }
+  }
+
+  void _startLocalMonitoring() {
+    final interval = _localRefreshInterval;
+    if (interval == null || _localRefreshTimer != null) return;
+    _localRefreshTimer = Timer.periodic(
+      interval,
+      (_) => unawaited(_refreshLocalDevices()),
+    );
+  }
+
+  Future<void> _refreshLocalDevices() async {
+    if (_isRefreshingLocalDevices ||
+        status != DeviceListStatus.loaded ||
+        isScanningNetwork) {
+      return;
+    }
+    _isRefreshingLocalDevices = true;
+    try {
+      final refreshedDevices = await _repository.getDevices();
+      if (status != DeviceListStatus.loaded) return;
+      final networkDevices = devices
+          .where((device) => device.connection == DeviceConnection.network)
+          .toList();
+      final updatedDevices = [...refreshedDevices, ...networkDevices];
+      if (_deviceListFingerprint(updatedDevices) !=
+          _deviceListFingerprint(devices)) {
+        devices = updatedDevices;
+        notifyListeners();
+      }
+    } catch (error) {
+      errorMessage = error.toString();
+      notifyListeners();
+    } finally {
+      _isRefreshingLocalDevices = false;
+    }
+  }
+
+  String _deviceListFingerprint(List<Device> values) {
+    return values.map(_deviceFingerprint).join('|');
+  }
+
+  String _deviceFingerprint(Device device) {
+    final components = device.components
+        .map((component) {
+          return [
+            component.id,
+            component.name,
+            component.type.name,
+            component.connection.name,
+            component.status.name,
+            component.details,
+            component.vendor,
+            component.connectionPort,
+            ...component.additionalDetails.entries.map(
+              (entry) => '${entry.key}=${entry.value}',
+            ),
+          ].join('\u0000');
+        })
+        .join('\u0001');
+    return [
+      device.id,
+      device.name,
+      device.type.name,
+      device.connection.name,
+      device.status.name,
+      device.details,
+      device.vendor,
+      device.connectionPort,
+      components,
+      ...device.additionalDetails.entries.map(
+        (entry) => '${entry.key}=${entry.value}',
+      ),
+    ].join('\u0000');
   }
 
   Future<void> refreshNetwork() async {
@@ -89,6 +170,7 @@ class DeviceListViewModel extends ChangeNotifier {
 
   void _networkSettingsChanged() {
     _automaticScanTimer?.cancel();
+    _localRefreshTimer?.cancel();
     _automaticScanTimer = null;
     if (_networkSettings?.automaticScan == true) {
       _automaticScanTimer = Timer.periodic(
