@@ -17,6 +17,8 @@ String labelForType(DeviceType type, AppLocalizations l10n) {
     DeviceType.storage => l10n.storage,
     DeviceType.unknown => l10n.unknownDevices,
     DeviceType.bluetooth => l10n.bluetoothDevices,
+    DeviceType.router => l10n.routers,
+    DeviceType.networkDevice => l10n.networkDevices,
   };
 }
 
@@ -33,6 +35,8 @@ IconData iconForDevice(Device device) {
     DeviceType.storage => Icons.storage,
     DeviceType.unknown => Icons.device_unknown,
     DeviceType.bluetooth => Icons.bluetooth,
+    DeviceType.router => Icons.router,
+    DeviceType.networkDevice => Icons.device_hub,
   };
 }
 

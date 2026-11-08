@@ -11,6 +11,8 @@ enum DeviceType {
   storage,
   unknown,
   bluetooth,
+  router,
+  networkDevice,
 }
 
 enum DeviceConnection { usb, bluetooth, audioJack, network, local, unknown }

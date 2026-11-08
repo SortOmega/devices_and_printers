@@ -553,6 +553,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Components'**
   String get deviceComponents;
+
+  /// No description provided for @routers.
+  ///
+  /// In en, this message translates to:
+  /// **'Routers and access points'**
+  String get routers;
+
+  /// No description provided for @networkDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Network devices'**
+  String get networkDevices;
 }
 
 class _AppLocalizationsDelegate

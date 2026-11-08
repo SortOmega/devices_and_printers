@@ -92,5 +92,7 @@
   "devicePort": "Port",
   "deviceDetails": "Details",
   "deviceVendor": "Provider",
-  "deviceComponents": "Components"
+  "deviceComponents": "Components",
+  "routers": "Routers and access points",
+  "networkDevices": "Network devices"
 }

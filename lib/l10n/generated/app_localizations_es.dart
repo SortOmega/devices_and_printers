@@ -244,4 +244,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deviceComponents => 'Componentes';
+
+  @override
+  String get routers => 'Routers y puntos de acceso';
+
+  @override
+  String get networkDevices => 'Dispositivos de red';
 }
