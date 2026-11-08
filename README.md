@@ -36,6 +36,10 @@ The first implementation queries the Linux system and displays:
   icon, name, provider when available, ID, type, status, connection, port,
   source details, and other detected attributes. On compact screens it uses
   the full screen; on desktop it appears on the right.
+- The contextual devices header adapts to narrow screens: filters stack in
+  compact fields, primary actions share available width, and secondary actions
+  remain accessible without horizontal overflow. The main navigation can also
+  scroll horizontally on small mobile screens.
 - The details panel includes localized `Info` and `Config` tabs. Configuration
   is intentionally marked as work in progress for now.
 - Network discovery can be refreshed independently from the toolbar and

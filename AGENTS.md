@@ -106,6 +106,10 @@ finishes, and cancel/invalidate it before a general device load. Automatic
 discovery is persisted in the network settings provider and, when enabled,
 runs at startup and once per minute.
 
+The devices contextual header must remain usable on mobile widths. Use a
+responsive layout that stacks filters and keeps action controls accessible;
+never allow the toolbar or primary navigation to overflow horizontally.
+
 Network discovery must not classify a host as a printer solely because it has
 HTTP/HTTPS open. Require an actual printing service (`631`, `9100`, or `515`)
 for printer classification; classify the default gateway and strong router
