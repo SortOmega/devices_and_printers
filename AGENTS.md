@@ -96,3 +96,11 @@ Keep common typed attributes on the `Device` model (`id`, `name`, `vendor`,
 source-specific values in `additionalDetails`. The `Info` tab is functional;
 the `Config` tab must remain visibly marked as work in progress until settings
 integration is implemented. All panel text must use the localized ARB files.
+Each `DeviceComponent` must be expandable in the Info tab and expose its
+technical fields, including its stable ID, for future component configuration.
+
+Physical devices with multiple system capabilities must be represented as one
+list entry using `Device.components`. Keep each component's type, status,
+connection, port, and source details in its `DeviceComponent` record so the
+Info panel can show the complete physical device without duplicating it in the
+list.

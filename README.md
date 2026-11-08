@@ -33,6 +33,14 @@ The first implementation queries the Linux system and displays:
   the full screen; on desktop it appears on the right.
 - The details panel includes localized `Info` and `Config` tabs. Configuration
   is intentionally marked as work in progress for now.
+- Physical devices can aggregate multiple detected capabilities into one list
+  entry. For example, a headset with audio output and microphone is listed
+  once, while both components and their individual data remain visible in the
+  `Info` panel.
+- Each component in the `Info` panel can be expanded to inspect its technical
+  identity, type, status, connection, provider, port, source details, and
+  additional attributes. Component IDs are preserved for future configuration
+  selection.
 - USB printers and plotters can be displayed even when no CUPS driver is
   configured, with their device identity marked as active or unknown.
 - Refresh through the toolbar or pull-to-refresh gesture.
