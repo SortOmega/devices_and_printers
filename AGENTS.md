@@ -99,6 +99,12 @@ integration is implemented. All panel text must use the localized ARB files.
 Each `DeviceComponent` must be expandable in the Info tab and expose its
 technical fields, including its stable ID, for future component configuration.
 
+Network discovery must not classify a host as a printer solely because it has
+HTTP/HTTPS open. Require an actual printing service (`631`, `9100`, or `515`)
+for printer classification; classify the default gateway and strong router
+hostname signals as routers, and preserve lower-confidence hosts as network
+devices with evidence in `additionalDetails`.
+
 Physical devices with multiple system capabilities must be represented as one
 list entry using `Device.components`. Keep each component's type, status,
 connection, port, and source details in its `DeviceComponent` record so the

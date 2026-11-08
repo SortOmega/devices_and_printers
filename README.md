@@ -26,6 +26,11 @@ The first implementation queries the Linux system and displays:
 - Device categories based on the actual device instead of the transport
   protocol.
 - Connection information such as USB, Bluetooth, network, local, or unknown.
+- Network scanning distinguishes printing services from web-only hosts. Hosts
+  matching the default gateway or router/access-point fingerprints are shown
+  as routers; other responsive hosts are shown as network devices instead of
+  being incorrectly labeled as printers. The panel retains the detected
+  classification and confidence.
 - Operational status: active, inactive, or disconnected.
 - Selecting a device opens a responsive details panel. It shows the device
   icon, name, provider when available, ID, type, status, connection, port,
