@@ -194,7 +194,7 @@ class SystemDeviceRepository implements DeviceRepository {
   }
 
   List<Device> _parseAudioDevices(String sinksOutput, String sourcesOutput) {
-    return [
+    final components = [
       ..._parseAudioPorts(
         sinksOutput,
         sectionPattern: RegExp(r'^Sink #'),
@@ -216,6 +216,49 @@ class SystemDeviceRepository implements DeviceRepository {
         excludedNamePattern: RegExp(r'\.monitor\b', caseSensitive: false),
       ),
     ];
+    final groups = <String, List<Device>>{};
+    for (final component in components) {
+      groups.putIfAbsent(_audioGroupKey(component.id), () => []).add(component);
+    }
+
+    return [for (final group in groups.values) _combineAudioDevices(group)];
+  }
+
+  String _audioGroupKey(String id) {
+    final name = id.replaceFirst('audio:', '').toLowerCase();
+    final isHeadsetPath =
+        name.contains('headphone') || name.contains('headset');
+    final normalized = name
+        .replaceAll(RegExp(r'^alsa_(output|input)\.'), '')
+        .replaceAll(RegExp(r'_(sink|source)$'), '')
+        .replaceAll(RegExp(r'[^a-z0-9]+'), ' ');
+    final withoutRole = normalized
+        .replaceAll(RegExp(r'\b(headphones?|headset|microphone|mic)\b'), '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    return isHeadsetPath ? withoutRole : '$withoutRole audio';
+  }
+
+  Device _combineAudioDevices(List<Device> devices) {
+    if (devices.length == 1) {
+      return devices.single.copyWith(
+        components: [devices.single.toComponent()],
+      );
+    }
+    final hasMicrophone = devices.any(
+      (device) => device.type == DeviceType.microphone,
+    );
+    final first = devices.first;
+    return Device(
+      id: 'audio-group:${_audioGroupKey(first.id)}',
+      name: first.name,
+      type: hasMicrophone ? DeviceType.headset : first.type,
+      connection: first.connection,
+      status: devices.any((device) => device.status == DeviceStatus.active)
+          ? DeviceStatus.active
+          : DeviceStatus.disconnected,
+      components: devices.map((device) => device.toComponent()).toList(),
+    );
   }
 
   List<Device> _parseAudioPorts(

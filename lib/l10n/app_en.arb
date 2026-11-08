@@ -90,5 +90,7 @@
   "deviceStatus": "Status",
   "deviceConnection": "Connection",
   "devicePort": "Port",
-  "deviceDetails": "Details"
+  "deviceDetails": "Details",
+  "deviceVendor": "Provider",
+  "deviceComponents": "Components"
 }

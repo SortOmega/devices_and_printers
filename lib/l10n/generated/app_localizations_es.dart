@@ -238,4 +238,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deviceDetails => 'Detalles';
+
+  @override
+  String get deviceVendor => 'Proveedor';
+
+  @override
+  String get deviceComponents => 'Componentes';
 }

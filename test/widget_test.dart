@@ -135,6 +135,14 @@ void main() {
     await tester.drag(find.byType(ListView).last, const Offset(0, -250));
     await tester.pumpAndSettle();
     expect(find.text('DisplayPort'), findsOneWidget);
+    expect(find.text('Components'), findsOneWidget);
+    expect(find.text('Display output', skipOffstage: false), findsOneWidget);
+    expect(find.text('Monitor speakers', skipOffstage: false), findsOneWidget);
+    await tester.tap(find.text('Display output'));
+    await tester.pumpAndSettle();
+    expect(find.text('monitor:detailed:display'), findsOneWidget);
+    expect(find.text('Acme Audio'), findsOneWidget);
+    expect(find.text('ALSA playback device'), findsOneWidget);
 
     await tester.tap(find.text('Config'));
     await tester.pumpAndSettle();
@@ -304,6 +312,27 @@ class _DetailsRepository implements DeviceRepository {
       connection: DeviceConnection.usb,
       connectionPort: 'DisplayPort',
       status: DeviceStatus.active,
+      components: [
+        DeviceComponent(
+          id: 'monitor:detailed:display',
+          name: 'Display output',
+          type: DeviceType.monitor,
+          connection: DeviceConnection.usb,
+          status: DeviceStatus.active,
+          details: 'ALSA playback device',
+          vendor: 'Acme Audio',
+          connectionPort: 'DisplayPort',
+        ),
+        DeviceComponent(
+          id: 'monitor:detailed:audio',
+          name: 'Monitor speakers',
+          type: DeviceType.headset,
+          connection: DeviceConnection.audioJack,
+          status: DeviceStatus.active,
+          details: 'ALSA capture device',
+          connectionPort: 'HDMI',
+        ),
+      ],
     ),
   ];
 }

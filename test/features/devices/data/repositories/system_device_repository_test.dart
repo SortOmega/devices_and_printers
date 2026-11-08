@@ -211,13 +211,19 @@ void main() {
 
     final devices = await repository.getDevices();
 
-    expect(devices, hasLength(2));
+    expect(devices, hasLength(1));
+    expect(devices.single.type, DeviceType.headset);
+    expect(devices.single.components, hasLength(2));
     expect(
-      devices.where((device) => device.type == DeviceType.headset),
+      devices.single.components.where(
+        (component) => component.type == DeviceType.headset,
+      ),
       hasLength(1),
     );
     expect(
-      devices.where((device) => device.type == DeviceType.microphone),
+      devices.single.components.where(
+        (component) => component.type == DeviceType.microphone,
+      ),
       hasLength(1),
     );
     expect(

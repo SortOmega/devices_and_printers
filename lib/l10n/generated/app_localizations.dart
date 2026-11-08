@@ -541,6 +541,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Details'**
   String get deviceDetails;
+
+  /// No description provided for @deviceVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get deviceVendor;
+
+  /// No description provided for @deviceComponents.
+  ///
+  /// In en, this message translates to:
+  /// **'Components'**
+  String get deviceComponents;
 }
 
 class _AppLocalizationsDelegate

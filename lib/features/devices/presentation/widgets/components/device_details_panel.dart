@@ -122,7 +122,87 @@ class _InfoTab extends StatelessWidget {
       for (final entry in device.additionalDetails.entries)
         _DetailRow(label: entry.key, value: entry.value),
     ];
+    if (device.components.isNotEmpty) {
+      rows.add(
+        Padding(
+          padding: const EdgeInsets.only(top: 4, bottom: 12),
+          child: Text(
+            l10n.deviceComponents,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+      );
+      rows.addAll(
+        device.components.map(
+          (component) => _ComponentCard(component: component),
+        ),
+      );
+    }
     return ListView(padding: const EdgeInsets.all(20), children: rows);
+  }
+}
+
+class _ComponentCard extends StatelessWidget {
+  const _ComponentCard({required this.component});
+
+  final DeviceComponent component;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final details = <String>[
+      labelForType(component.type, l10n),
+      statusLabel(component.status, l10n),
+      if (component.connectionPort != null) component.connectionPort!,
+    ];
+    final technicalRows = <Widget>[
+      _DetailRow(label: l10n.deviceId, value: component.id),
+      _DetailRow(
+        label: l10n.deviceType,
+        value: labelForType(component.type, l10n),
+      ),
+      _DetailRow(
+        label: l10n.deviceStatus,
+        value: statusLabel(component.status, l10n),
+      ),
+      _DetailRow(
+        label: l10n.deviceConnection,
+        value: connectionLabel(component.connection, l10n),
+      ),
+      if (component.vendor != null)
+        _DetailRow(label: l10n.deviceVendor, value: component.vendor!),
+      if (component.connectionPort != null)
+        _DetailRow(label: l10n.devicePort, value: component.connectionPort!),
+      if (component.details != null)
+        _DetailRow(label: l10n.deviceDetails, value: component.details!),
+      for (final entry in component.additionalDetails.entries)
+        _DetailRow(label: entry.key, value: entry.value),
+    ];
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ExpansionTile(
+        key: ValueKey('component:${component.id}'),
+        leading: Icon(
+          iconForDevice(
+            Device(
+              id: component.id,
+              name: component.name,
+              type: component.type,
+              connection: component.connection,
+              status: component.status,
+            ),
+          ),
+        ),
+        title: Text(component.name),
+        subtitle: Text(details.join(' · ')),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Column(children: technicalRows),
+          ),
+        ],
+      ),
+    );
   }
 }
 
