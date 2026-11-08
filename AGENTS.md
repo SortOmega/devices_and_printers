@@ -110,6 +110,11 @@ The devices contextual header must remain usable on mobile widths. Use a
 responsive layout that stacks filters and keeps action controls accessible;
 never allow the toolbar or primary navigation to overflow horizontally.
 
+After the initial load, production must monitor system-backed local devices
+with a one-second refresh interval. Reconcile and notify listeners only when
+device data changes, and keep network discovery independent so a local change
+does not restart or discard an active network scan.
+
 Network discovery must not classify a host as a printer solely because it has
 HTTP/HTTPS open. Require an actual printing service (`631`, `9100`, or `515`)
 for printer classification; classify the default gateway and strong router

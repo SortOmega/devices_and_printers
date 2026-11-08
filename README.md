@@ -32,6 +32,11 @@ The first implementation queries the Linux system and displays:
   being incorrectly labeled as printers. The panel retains the detected
   classification and confidence.
 - Operational status: active, inactive, or disconnected.
+- Local devices are monitored every second after the initial load. The
+  application refreshes the system-backed local list only when its data
+  changes, so connected, disconnected, and status changes appear quickly
+  without rebuilding the UI unnecessarily. Network scanning remains an
+  independent operation.
 - Selecting a device opens a responsive details panel. It shows the device
   icon, name, provider when available, ID, type, status, connection, port,
   source details, and other detected attributes. On compact screens it uses
