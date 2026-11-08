@@ -94,5 +94,12 @@
   "deviceVendor": "Proveedor",
   "deviceComponents": "Componentes",
   "routers": "Routers y puntos de acceso",
-  "networkDevices": "Dispositivos de red"
+  "networkDevices": "Dispositivos de red",
+  "networkScanInProgress": "Buscando dispositivos en la red…",
+  "networkScanFailed": "Falló la búsqueda de red: {error}",
+  "@networkScanFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  }
 }

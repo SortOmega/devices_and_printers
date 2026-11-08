@@ -565,6 +565,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Network devices'**
   String get networkDevices;
+
+  /// No description provided for @networkScanInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for devices on the network…'**
+  String get networkScanInProgress;
+
+  /// No description provided for @networkScanFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Network search failed: {error}'**
+  String networkScanFailed(Object error);
 }
 
 class _AppLocalizationsDelegate

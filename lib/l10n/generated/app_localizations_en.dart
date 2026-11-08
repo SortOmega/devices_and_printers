@@ -250,4 +250,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get networkDevices => 'Network devices';
+
+  @override
+  String get networkScanInProgress => 'Searching for devices on the network…';
+
+  @override
+  String networkScanFailed(Object error) {
+    return 'Network search failed: $error';
+  }
 }

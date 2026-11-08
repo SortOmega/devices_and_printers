@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:devices_and_printers/features/devices/domain/models/device.dart';
+import 'package:devices_and_printers/features/devices/data/data_sources/network_device_scanner.dart';
 import 'package:devices_and_printers/features/devices/domain/repositories/device_repository.dart';
 import 'package:devices_and_printers/features/devices/presentation/view_models/device_list_view_model.dart';
 import 'package:devices_and_printers/features/devices/presentation/widgets/windows/devices_window.dart';
@@ -89,6 +92,27 @@ void main() {
     expect(find.text('Office Monitor'), findsOneWidget);
     expect(find.byIcon(Icons.monitor), findsOneWidget);
     expect(find.text('Active · USB'), findsOneWidget);
+  });
+
+  testWidgets('shows network scan progress in the footer', (
+    WidgetTester tester,
+  ) async {
+    final scanner = _PendingNetworkScanner();
+    final viewModel = DeviceListViewModel(FakeDeviceRepository(), scanner)
+      ..loadDevices();
+
+    await tester.pumpWidget(
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Searching for devices on the network…'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    scanner.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('Searching for devices on the network…'), findsNothing);
   });
 
   testWidgets('shows a border only after selecting a device', (
@@ -335,4 +359,13 @@ class _DetailsRepository implements DeviceRepository {
       ],
     ),
   ];
+}
+
+class _PendingNetworkScanner implements NetworkDeviceScanner {
+  final Completer<List<Device>> _completer = Completer<List<Device>>();
+
+  void complete() => _completer.complete(const []);
+
+  @override
+  Future<List<Device>> scan() => _completer.future;
 }

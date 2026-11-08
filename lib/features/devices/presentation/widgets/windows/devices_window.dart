@@ -7,6 +7,7 @@ import '../../../domain/models/device.dart';
 import '../../view_models/device_list_view_model.dart';
 import 'about_window.dart';
 import '../components/device_group.dart';
+import '../components/async_operation_footer.dart';
 import '../components/device_details_panel.dart';
 import '../components/device_labels.dart';
 import '../components/devices_toolbar.dart';
@@ -156,6 +157,12 @@ class _DeviceListScreenState extends State<DeviceListScreen> {
             Expanded(child: _buildPage(context)),
           ],
         ),
+        bottomNavigationBar: _activePage == 'devices'
+            ? AsyncOperationFooter(
+                isRunning: widget.viewModel.isScanningNetwork,
+                errorMessage: widget.viewModel.networkErrorMessage,
+              )
+            : null,
       ),
     );
   }
