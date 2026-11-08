@@ -38,6 +38,11 @@ The first implementation queries the Linux system and displays:
   the full screen; on desktop it appears on the right.
 - The details panel includes localized `Info` and `Config` tabs. Configuration
   is intentionally marked as work in progress for now.
+- Network discovery can be refreshed independently from the toolbar and
+  canceled while running. Existing network devices remain visible during the
+  refresh and are replaced only when the new scan completes. Automatic network
+  discovery can be enabled in Settings and then runs at startup and every
+  minute.
 - Physical devices can aggregate multiple detected capabilities into one list
   entry. For example, a headset with audio output and microphone is listed
   once, while both components and their individual data remain visible in the

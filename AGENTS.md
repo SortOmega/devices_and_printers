@@ -99,6 +99,13 @@ integration is implemented. All panel text must use the localized ARB files.
 Each `DeviceComponent` must be expandable in the Info tab and expose its
 technical fields, including its stable ID, for future component configuration.
 
+Network discovery is an independent operation. The UI must expose a localized
+refresh action and a cancel action, preserve previously discovered network
+devices while a refresh is running, replace only the network subset when it
+finishes, and cancel/invalidate it before a general device load. Automatic
+discovery is persisted in the network settings provider and, when enabled,
+runs at startup and once per minute.
+
 Network discovery must not classify a host as a printer solely because it has
 HTTP/HTTPS open. Require an actual printing service (`631`, `9100`, or `515`)
 for printer classification; classify the default gateway and strong router
