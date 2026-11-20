@@ -340,6 +340,21 @@ class SystemDeviceRepository implements DeviceRepository {
 
   DeviceType? _classifyDevice(String name) {
     final normalizedName = name.toLowerCase();
+    if (_containsAny(normalizedName, [
+      'playstation',
+      'ps5',
+      'ps4',
+      'xbox',
+      'nintendo',
+      'switch',
+      'steam deck',
+      'game console',
+      'gaming console',
+      'gamepad',
+      'joystick',
+    ])) {
+      return DeviceType.gameConsole;
+    }
     if (_containsAny(normalizedName, ['plotter', 'plot'])) {
       return DeviceType.plotter;
     }

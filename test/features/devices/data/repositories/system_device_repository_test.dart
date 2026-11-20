@@ -18,6 +18,39 @@ class FakeCommandRunner implements SystemCommandRunner {
 }
 
 void main() {
+  test('classifies common USB game consoles', () async {
+    final repository = SystemDeviceRepository(
+      commandRunner: FakeCommandRunner({
+        'lpstat': const CommandResult(stdout: '', stderr: '', exitCode: 0),
+        'lsusb': const CommandResult(
+          stdout:
+              'Bus 001 Device 010: ID 054c:0ce6 Sony PlayStation 5\n'
+              'Bus 001 Device 011: ID 045e:02ea Microsoft Xbox Controller\n',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'bluetoothctl devices': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+        'bluetoothctl devices Connected': const CommandResult(
+          stdout: '',
+          stderr: '',
+          exitCode: 0,
+        ),
+      }),
+    );
+
+    final devices = await repository.getDevices();
+
+    expect(devices, hasLength(2));
+    expect(
+      devices.every((device) => device.type == DeviceType.gameConsole),
+      isTrue,
+    );
+  });
+
   test('parses known devices and filters generic USB entries', () async {
     final repository = SystemDeviceRepository(
       commandRunner: FakeCommandRunner({

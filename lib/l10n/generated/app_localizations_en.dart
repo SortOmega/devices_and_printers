@@ -180,6 +180,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storage => 'Storage';
 
   @override
+  String get gameConsoles => 'Game consoles';
+
+  @override
   String get unknownDevices => 'Unknown devices';
 
   @override

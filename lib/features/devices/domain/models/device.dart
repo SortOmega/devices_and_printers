@@ -9,6 +9,7 @@ enum DeviceType {
   phone,
   camera,
   storage,
+  gameConsole,
   unknown,
   bluetooth,
   router,

@@ -422,6 +422,12 @@ abstract class AppLocalizations {
   /// **'Storage'**
   String get storage;
 
+  /// No description provided for @gameConsoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Game consoles'**
+  String get gameConsoles;
+
   /// No description provided for @unknownDevices.
   ///
   /// In en, this message translates to:
