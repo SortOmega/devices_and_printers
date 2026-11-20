@@ -59,6 +59,7 @@ class DevicesToolbar extends StatelessWidget {
                     onRefreshNetwork: onRefreshNetwork,
                     isScanningNetwork: isScanningNetwork,
                     geometry: geometry,
+                    isVeryCompact: constraints.maxWidth < 360,
                   )
                 : Wrap(
                     spacing: 6,
@@ -176,6 +177,7 @@ class _CompactToolbar extends StatelessWidget {
     required this.onRefreshNetwork,
     required this.isScanningNetwork,
     required this.geometry,
+    required this.isVeryCompact,
   });
 
   final String sortOption;
@@ -188,6 +190,7 @@ class _CompactToolbar extends StatelessWidget {
   final VoidCallback onRefreshNetwork;
   final bool isScanningNetwork;
   final AppThemeGeometry geometry;
+  final bool isVeryCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -195,75 +198,133 @@ class _CompactToolbar extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _ToolbarDropdown(
-                label: l10n.sortLabel,
-                value: sortOption,
-                borderRadius: geometry.controlRadius,
-                dropdownColor: theme.colorScheme.surfaceContainer,
-                items: [
-                  DropdownMenuItem(value: 'name', child: Text(l10n.sortName)),
-                  DropdownMenuItem(
-                    value: 'status',
-                    child: Text(l10n.sortStatus),
-                  ),
-                  DropdownMenuItem(
-                    value: 'connection',
-                    child: Text(l10n.sortConnection),
-                  ),
-                ],
-                onChanged: onSortChanged,
+        if (isVeryCompact) ...[
+          _ToolbarDropdown(
+            label: l10n.sortLabel,
+            value: sortOption,
+            borderRadius: geometry.controlRadius,
+            dropdownColor: theme.colorScheme.surfaceContainer,
+            items: [
+              DropdownMenuItem(value: 'name', child: Text(l10n.sortName)),
+              DropdownMenuItem(value: 'status', child: Text(l10n.sortStatus)),
+              DropdownMenuItem(
+                value: 'connection',
+                child: Text(l10n.sortConnection),
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _ToolbarDropdown(
-                label: l10n.groupLabel,
-                value: groupOption,
-                borderRadius: geometry.controlRadius,
-                dropdownColor: theme.colorScheme.surfaceContainer,
-                items: [
-                  DropdownMenuItem(value: 'type', child: Text(l10n.groupType)),
-                  DropdownMenuItem(
-                    value: 'status',
-                    child: Text(l10n.groupStatus),
-                  ),
-                  DropdownMenuItem(
-                    value: 'connection',
-                    child: Text(l10n.groupConnection),
-                  ),
-                  DropdownMenuItem(
-                    value: 'default',
-                    child: Text(l10n.groupDefault),
-                  ),
-                ],
-                onChanged: onGroupChanged,
+            ],
+            onChanged: onSortChanged,
+          ),
+          const SizedBox(height: 8),
+          _ToolbarDropdown(
+            label: l10n.groupLabel,
+            value: groupOption,
+            borderRadius: geometry.controlRadius,
+            dropdownColor: theme.colorScheme.surfaceContainer,
+            items: [
+              DropdownMenuItem(value: 'type', child: Text(l10n.groupType)),
+              DropdownMenuItem(value: 'status', child: Text(l10n.groupStatus)),
+              DropdownMenuItem(
+                value: 'connection',
+                child: Text(l10n.groupConnection),
               ),
-            ),
-          ],
-        ),
+              DropdownMenuItem(
+                value: 'default',
+                child: Text(l10n.groupDefault),
+              ),
+            ],
+            onChanged: onGroupChanged,
+          ),
+        ] else
+          Row(
+            children: [
+              Expanded(
+                child: _ToolbarDropdown(
+                  label: l10n.sortLabel,
+                  value: sortOption,
+                  borderRadius: geometry.controlRadius,
+                  dropdownColor: theme.colorScheme.surfaceContainer,
+                  items: [
+                    DropdownMenuItem(value: 'name', child: Text(l10n.sortName)),
+                    DropdownMenuItem(
+                      value: 'status',
+                      child: Text(l10n.sortStatus),
+                    ),
+                    DropdownMenuItem(
+                      value: 'connection',
+                      child: Text(l10n.sortConnection),
+                    ),
+                  ],
+                  onChanged: onSortChanged,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _ToolbarDropdown(
+                  label: l10n.groupLabel,
+                  value: groupOption,
+                  borderRadius: geometry.controlRadius,
+                  dropdownColor: theme.colorScheme.surfaceContainer,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'type',
+                      child: Text(l10n.groupType),
+                    ),
+                    DropdownMenuItem(
+                      value: 'status',
+                      child: Text(l10n.groupStatus),
+                    ),
+                    DropdownMenuItem(
+                      value: 'connection',
+                      child: Text(l10n.groupConnection),
+                    ),
+                    DropdownMenuItem(
+                      value: 'default',
+                      child: Text(l10n.groupDefault),
+                    ),
+                  ],
+                  onChanged: onGroupChanged,
+                ),
+              ),
+            ],
+          ),
         const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: FilledButton.icon(
+        if (isVeryCompact)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FilledButton.icon(
                 onPressed: onAddDevice,
                 icon: const Icon(Icons.add, size: 18),
                 label: Text(l10n.addDevice),
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: OutlinedButton.icon(
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
                 onPressed: onAddPrinter,
                 icon: const Icon(Icons.print, size: 18),
                 label: Text(l10n.addPrinter),
               ),
-            ),
-          ],
-        ),
+            ],
+          )
+        else
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: onAddDevice,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: Text(l10n.addDevice),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onAddPrinter,
+                  icon: const Icon(Icons.print, size: 18),
+                  label: Text(l10n.addPrinter),
+                ),
+              ),
+            ],
+          ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -306,7 +367,13 @@ class _ToolbarDropdown extends StatelessWidget {
     return DropdownButtonFormField<String>(
       initialValue: value,
       isDense: true,
-      decoration: InputDecoration(labelText: label),
+      isExpanded: true,
+      iconSize: 16,
+      decoration: InputDecoration(
+        labelText: label,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      ),
       borderRadius: BorderRadius.circular(borderRadius),
       dropdownColor: dropdownColor,
       items: items,

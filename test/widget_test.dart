@@ -113,6 +113,24 @@ void main() {
     expect(find.byIcon(Icons.lan), findsOneWidget);
   });
 
+  testWidgets('keeps the devices header usable at extreme narrow widths', (
+    WidgetTester tester,
+  ) async {
+    final viewModel = DeviceListViewModel(FakeDeviceRepository())
+      ..loadDevices();
+
+    await tester.pumpWidget(
+      localizedApp(
+        SizedBox(width: 220, child: DeviceListScreen(viewModel: viewModel)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Sort:'), findsOneWidget);
+    expect(find.text('Group:'), findsOneWidget);
+  });
+
   testWidgets('primary navigation renders a bottom shadow', (
     WidgetTester tester,
   ) async {
