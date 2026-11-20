@@ -9,6 +9,7 @@ import 'package:devices_and_printers/features/devices/data/data_sources/network_
 import 'package:devices_and_printers/features/devices/domain/repositories/device_repository.dart';
 import 'package:devices_and_printers/features/devices/presentation/view_models/device_list_view_model.dart';
 import 'package:devices_and_printers/features/devices/presentation/widgets/windows/devices_window.dart';
+import 'package:devices_and_printers/features/devices/presentation/widgets/components/device_card.dart';
 import 'package:devices_and_printers/l10n/generated/app_localizations.dart';
 
 class FakeDeviceRepository implements DeviceRepository {
@@ -72,6 +73,45 @@ Widget localizedApp(Widget home) {
 }
 
 void main() {
+  testWidgets('shows a Bluetooth badge only for active Bluetooth devices', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      localizedApp(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            DeviceCard(
+              device: const Device(
+                id: 'bluetooth:connected',
+                name: 'Connected headset',
+                type: DeviceType.headset,
+                connection: DeviceConnection.bluetooth,
+                status: DeviceStatus.active,
+              ),
+              isSelected: false,
+              onSelected: (_) {},
+            ),
+            const SizedBox(width: 12),
+            DeviceCard(
+              device: const Device(
+                id: 'bluetooth:disconnected',
+                name: 'Disconnected headset',
+                type: DeviceType.headset,
+                connection: DeviceConnection.bluetooth,
+                status: DeviceStatus.disconnected,
+              ),
+              isSelected: false,
+              onSelected: (_) {},
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.bluetooth), findsOneWidget);
+  });
+
   testWidgets('shows queried devices grouped by type', (
     WidgetTester tester,
   ) async {

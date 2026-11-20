@@ -17,6 +17,11 @@ The first implementation queries the Linux system and displays:
   devices instead of disappearing.
 - Known Bluetooth devices reported by `bluetoothctl`, including devices that
   are currently disconnected.
+- Bluetooth peripherals are classified by their real device type (headsets,
+  microphones, speakers, keyboards, mice, phones, cameras, consoles, and
+  others). Active Bluetooth devices show a small Bluetooth badge alongside
+  their primary device icon. Matching Bluetooth and USB/audio identities are
+  grouped as one physical device when their names match safely.
 - Headphones and jack microphones reported by PipeWire/PulseAudio through
   `pactl`, using only physically available audio ports and excluding internal
   digital microphones and monitor sources.

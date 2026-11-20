@@ -180,6 +180,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get storage => 'Almacenamiento';
 
   @override
+  String get speakers => 'Altavoces';
+
+  @override
   String get gameConsoles => 'Consolas';
 
   @override

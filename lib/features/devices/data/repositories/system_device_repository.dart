@@ -23,13 +23,28 @@ class SystemDeviceRepository implements DeviceRepository {
       _commandRunner.run('pactl', ['list', 'sources']),
     ]);
 
+    final bluetoothAddresses = _bluetoothAddresses(results[2].stdout);
+    final bluetoothInfoResults = await Future.wait([
+      for (final address in bluetoothAddresses)
+        _commandRunner.run('bluetoothctl', ['info', address]),
+    ]);
+    final bluetoothInfo = <String, String>{
+      for (var index = 0; index < bluetoothAddresses.length; index++)
+        bluetoothAddresses[index]: bluetoothInfoResults[index].stdout,
+    };
+
     final printers = _parsePrinters(results[0].stdout);
-    final devices = [
+    final discoveredDevices = [
       ...printers,
       ..._parseUsbDevices(results[1].stdout, printers),
-      ..._parseBluetoothDevices(results[2].stdout, results[3].stdout),
+      ..._parseBluetoothDevices(
+        results[2].stdout,
+        results[3].stdout,
+        bluetoothInfo,
+      ),
       ..._parseAudioDevices(results[4].stdout, results[5].stdout),
     ];
+    final devices = _mergeEquivalentDevices(discoveredDevices);
     if (cache != null) {
       unawaited(cache!.save(devices));
     }
@@ -172,7 +187,22 @@ class SystemDeviceRepository implements DeviceRepository {
     ]);
   }
 
-  List<Device> _parseBluetoothDevices(String output, String connectedOutput) {
+  List<String> _bluetoothAddresses(String output) {
+    return output
+        .split('\n')
+        .where((line) => line.trim().startsWith('Device '))
+        .map((line) => line.trim().split(RegExp(r'\s+')))
+        .where((parts) => parts.length > 1)
+        .map((parts) => parts[1])
+        .toSet()
+        .toList();
+  }
+
+  List<Device> _parseBluetoothDevices(
+    String output,
+    String connectedOutput,
+    Map<String, String> infoByAddress,
+  ) {
     final connectedIds = connectedOutput
         .split('\n')
         .where((line) => line.trim().startsWith('Device '))
@@ -186,19 +216,219 @@ class SystemDeviceRepository implements DeviceRepository {
           final parts = line.trim().split(RegExp(r'\s+'));
           final id = parts.length > 1 ? parts[1] : line.hashCode.toString();
           final name = parts.length > 2 ? parts.sublist(2).join(' ') : id;
+          final info = infoByAddress[id] ?? '';
+          final infoName = _bluetoothInfoField(info, 'Name');
+          final iconName = _bluetoothInfoField(info, 'Icon');
+          final deviceClass = _bluetoothInfoField(info, 'Class');
+          final displayName = infoName ?? name;
+          final type =
+              _bluetoothType(displayName, iconName) ??
+              _classifyDevice(displayName) ??
+              DeviceType.unknown;
           return Device(
             id: 'bluetooth:$id',
-            name: name,
-            type: _classifyDevice(name) ?? DeviceType.bluetooth,
+            name: displayName,
+            type: type,
             connection: DeviceConnection.bluetooth,
             status: connectedIds.contains(id)
                 ? DeviceStatus.active
                 : DeviceStatus.disconnected,
             details: id,
             connectionPort: id,
+            additionalDetails: {
+              'bluetoothAddress': id,
+              'bluetoothIcon': ?iconName,
+              'bluetoothClass': ?deviceClass,
+            },
           );
         })
         .toList();
+  }
+
+  String? _bluetoothInfoField(String info, String field) {
+    final match = RegExp(
+      '^\\s*$field:\\s*(.+)\$',
+      multiLine: true,
+      caseSensitive: false,
+    ).firstMatch(info);
+    return match?.group(1)?.trim();
+  }
+
+  DeviceType? _bluetoothType(String name, String? iconName) {
+    final normalizedIcon = iconName?.toLowerCase() ?? '';
+    if (normalizedIcon.contains('gaming') ||
+        normalizedIcon.contains('joystick') ||
+        normalizedIcon.contains('gamepad') ||
+        _containsAny(name.toLowerCase(), [
+          'gamepad',
+          'joystick',
+          'dualsense',
+          'dual sense',
+          'xbox',
+          'playstation',
+        ])) {
+      return DeviceType.gameConsole;
+    }
+    if (normalizedIcon.contains('headset') ||
+        normalizedIcon.contains('headphone') ||
+        _containsAny(name.toLowerCase(), [
+          'headset',
+          'headphone',
+          'earbud',
+          'auricular',
+        ])) {
+      return DeviceType.headset;
+    }
+    if (normalizedIcon.contains('microphone') ||
+        _containsAny(name.toLowerCase(), ['microphone', ' microphone '])) {
+      return DeviceType.microphone;
+    }
+    if (normalizedIcon.contains('speaker') ||
+        normalizedIcon.contains('audio-card') ||
+        _containsAny(name.toLowerCase(), [
+          'speaker',
+          'parlante',
+          'soundbar',
+          'loudspeaker',
+        ])) {
+      return DeviceType.speaker;
+    }
+    if (normalizedIcon.contains('keyboard')) {
+      return DeviceType.keyboard;
+    }
+    if (normalizedIcon.contains('mouse')) {
+      return DeviceType.mouse;
+    }
+    if (normalizedIcon.contains('camera')) {
+      return DeviceType.camera;
+    }
+    if (normalizedIcon.contains('phone')) {
+      return DeviceType.phone;
+    }
+    return null;
+  }
+
+  List<Device> _mergeEquivalentDevices(List<Device> devices) {
+    final merged = <Device>[];
+    final consumedIds = <int>{};
+
+    for (
+      var bluetoothIndex = 0;
+      bluetoothIndex < devices.length;
+      bluetoothIndex++
+    ) {
+      final bluetoothDevice = devices[bluetoothIndex];
+      if (bluetoothDevice.connection != DeviceConnection.bluetooth ||
+          consumedIds.contains(bluetoothIndex)) {
+        continue;
+      }
+
+      var candidateIndex = -1;
+      for (var index = 0; index < devices.length; index++) {
+        if (index == bluetoothIndex ||
+            consumedIds.contains(index) ||
+            devices[index].connection == DeviceConnection.bluetooth ||
+            devices[index].connection == DeviceConnection.network) {
+          continue;
+        }
+        if (_namesMayMatch(bluetoothDevice.name, devices[index].name)) {
+          candidateIndex = index;
+          break;
+        }
+      }
+      if (candidateIndex < 0) continue;
+
+      consumedIds
+        ..add(bluetoothIndex)
+        ..add(candidateIndex);
+      merged.add(
+        _mergeBluetoothWithCandidate(bluetoothDevice, devices[candidateIndex]),
+      );
+    }
+
+    for (var index = 0; index < devices.length; index++) {
+      if (!consumedIds.contains(index)) {
+        merged.add(devices[index]);
+      }
+    }
+    return merged;
+  }
+
+  bool _namesMayMatch(String firstName, String secondName) {
+    final first = _normalizedDeviceName(firstName);
+    final second = _normalizedDeviceName(secondName);
+    if (first.isEmpty || second.isEmpty) return false;
+    if (first == second) return true;
+    return first.length >= 6 &&
+        second.length >= 6 &&
+        (first.contains(second) || second.contains(first));
+  }
+
+  String _normalizedDeviceName(String name) {
+    var normalized = name
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
+        .trim();
+    const removableTokens = [
+      'corp',
+      'corporation',
+      'bluetooth',
+      'wireless',
+      'controller',
+      'headphones',
+      'headset',
+      'microphone',
+      'speaker',
+      'parlante',
+      'audio',
+      'built',
+      'in',
+      'output',
+      'input',
+    ];
+    final tokens = normalized
+        .split(' ')
+        .where((token) => token.isNotEmpty && !removableTokens.contains(token));
+    return tokens.join(' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+  }
+
+  Device _mergeBluetoothWithCandidate(
+    Device bluetoothDevice,
+    Device candidate,
+  ) {
+    final candidateComponents = candidate.components.isNotEmpty
+        ? candidate.components
+        : [candidate.toComponent()];
+    final bluetoothComponent = bluetoothDevice.toComponent();
+    final components = [
+      ...candidateComponents,
+      if (!candidateComponents.any(
+        (component) => component.id == bluetoothComponent.id,
+      ))
+        bluetoothComponent,
+    ];
+    final resolvedType =
+        candidate.type != DeviceType.unknown &&
+            candidate.type != DeviceType.bluetooth
+        ? candidate.type
+        : bluetoothDevice.type;
+    final details = candidate.additionalDetails;
+    return Device(
+      id: candidate.id,
+      name: candidate.name,
+      type: resolvedType,
+      connection: candidate.connection,
+      status:
+          candidate.status == DeviceStatus.active ||
+              bluetoothDevice.status == DeviceStatus.active
+          ? DeviceStatus.active
+          : candidate.status,
+      details: candidate.details,
+      vendor: candidate.vendor,
+      connectionPort: candidate.connectionPort,
+      additionalDetails: {...details, ...bluetoothDevice.additionalDetails},
+      components: components,
+    );
   }
 
   List<Device> _parseAudioDevices(String sinksOutput, String sourcesOutput) {
@@ -340,6 +570,15 @@ class SystemDeviceRepository implements DeviceRepository {
 
   DeviceType? _classifyDevice(String name) {
     final normalizedName = name.toLowerCase();
+    if (_containsAny(normalizedName, [
+      'speaker',
+      'parlante',
+      'soundbar',
+      'loudspeaker',
+      'homepod',
+    ])) {
+      return DeviceType.speaker;
+    }
     if (_containsAny(normalizedName, [
       'playstation',
       'ps5',

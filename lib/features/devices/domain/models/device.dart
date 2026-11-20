@@ -9,6 +9,7 @@ enum DeviceType {
   phone,
   camera,
   storage,
+  speaker,
   gameConsole,
   unknown,
   bluetooth,
@@ -72,6 +73,15 @@ class Device {
   bool get isPrinter => type == DeviceType.printer;
 
   bool get isActive => status == DeviceStatus.active;
+
+  bool get hasBluetoothConnection =>
+      (connection == DeviceConnection.bluetooth &&
+          status == DeviceStatus.active) ||
+      components.any(
+        (component) =>
+            component.connection == DeviceConnection.bluetooth &&
+            component.status == DeviceStatus.active,
+      );
 
   Device copyWith({List<DeviceComponent>? components}) {
     return Device(

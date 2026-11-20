@@ -18,6 +18,69 @@ class FakeCommandRunner implements SystemCommandRunner {
 }
 
 void main() {
+  test(
+    'classifies Bluetooth devices by their real type and merges matching ports',
+    () async {
+      final repository = SystemDeviceRepository(
+        commandRunner: FakeCommandRunner({
+          'lpstat': const CommandResult(stdout: '', stderr: '', exitCode: 0),
+          'lsusb': const CommandResult(
+            stdout: 'Bus 001 Device 010: ID 054c:0ce6 Corp. DualSense wireless controller\n',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'bluetoothctl devices': const CommandResult(
+            stdout:
+                'Device AA:BB:CC:DD:EE:10 DualSense Wireless Controller\n'
+                'Device AA:BB:CC:DD:EE:11 Living Room Speaker\n',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'bluetoothctl devices Connected': const CommandResult(
+            stdout: 'Device AA:BB:CC:DD:EE:10 DualSense Wireless Controller\n',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'bluetoothctl info AA:BB:CC:DD:EE:10': const CommandResult(
+            stdout:
+                'Device AA:BB:CC:DD:EE:10 (AA:BB:CC:DD:EE:10)\n'
+                '\tName: DualSense Wireless Controller\n'
+                '\tIcon: input-gaming\n'
+                '\tClass: 0x000005\n',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'bluetoothctl info AA:BB:CC:DD:EE:11': const CommandResult(
+            stdout:
+                'Device AA:BB:CC:DD:EE:11 (AA:BB:CC:DD:EE:11)\n'
+                '\tName: Living Room Speaker\n'
+                '\tIcon: audio-card\n'
+                '\tClass: 0x000414\n',
+            stderr: '',
+            exitCode: 0,
+          ),
+        }),
+      );
+
+      final devices = await repository.getDevices();
+
+      expect(devices, hasLength(2));
+      final controller = devices.singleWhere(
+        (device) => device.name.contains('DualSense'),
+      );
+      expect(controller.type, DeviceType.gameConsole);
+      expect(controller.connection, DeviceConnection.usb);
+      expect(controller.hasBluetoothConnection, isTrue);
+      expect(controller.components, hasLength(2));
+
+      final speaker = devices.singleWhere(
+        (device) => device.name == 'Living Room Speaker',
+      );
+      expect(speaker.type, DeviceType.speaker);
+      expect(speaker.connection, DeviceConnection.bluetooth);
+    },
+  );
+
   test('classifies common USB game consoles', () async {
     final repository = SystemDeviceRepository(
       commandRunner: FakeCommandRunner({

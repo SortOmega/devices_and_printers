@@ -131,3 +131,9 @@ list entry using `Device.components`. Keep each component's type, status,
 connection, port, and source details in its `DeviceComponent` record so the
 Info panel can show the complete physical device without duplicating it in the
 list.
+
+Bluetooth devices must use their real type icon, such as headset, microphone,
+speaker, mouse, keyboard, phone, camera, or game console. Show a Bluetooth
+badge only for an active Bluetooth connection. Group another transport with
+Bluetooth only through a conservative identity match, never by weak or
+coincidental name overlap.

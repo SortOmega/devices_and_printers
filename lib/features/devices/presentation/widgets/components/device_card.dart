@@ -67,12 +67,33 @@ class _DeviceCardState extends State<DeviceCard> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                iconForDevice(widget.device),
-                size: 52,
-                color: isSelected
-                    ? theme.colorScheme.onPrimaryContainer
-                    : theme.colorScheme.primary,
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    iconForDevice(widget.device),
+                    size: 52,
+                    color: isSelected
+                        ? theme.colorScheme.onPrimaryContainer
+                        : theme.colorScheme.primary,
+                  ),
+                  if (widget.device.hasBluetoothConnection)
+                    Positioned(
+                      right: -10,
+                      top: -4,
+                      child: Tooltip(
+                        message: l10n.bluetooth,
+                        child: Icon(
+                          Icons.bluetooth,
+                          size: 18,
+                          color: isSelected
+                              ? theme.colorScheme.onPrimaryContainer
+                              : theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                ],
               ),
               Text(
                 widget.device.name,
