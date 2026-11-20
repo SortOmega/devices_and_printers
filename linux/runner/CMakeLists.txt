@@ -19,8 +19,28 @@ apply_standard_settings(${BINARY_NAME})
 # Add preprocessor definitions for the application ID.
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
+target_compile_definitions(${BINARY_NAME} PRIVATE
+  APP_ICON_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/app_icon.png"
+)
+
 # Add dependency libraries. Add any application-specific dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/app_icon.png"
+  DESTINATION "."
+  COMPONENT Runtime
+)
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/app_icon.png"
+  DESTINATION "share/icons/hicolor/512x512/apps"
+  RENAME "${APPLICATION_ID}.png"
+  COMPONENT Runtime
+)
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/${APPLICATION_ID}.desktop"
+  DESTINATION "share/applications"
+  COMPONENT Runtime
+)

@@ -2,6 +2,8 @@
 
 #include <flutter_linux/flutter_linux.h>
 
+#include <glib/gstdio.h>
+
 #include "flutter/generated_plugin_registrant.h"
 
 struct _MyApplication {
@@ -10,6 +12,48 @@ struct _MyApplication {
 };
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
+
+static void set_application_icon(GtkWindow* window) {
+  g_autofree gchar* executable_path =
+      g_file_read_link("/proc/self/exe", nullptr);
+  g_autofree gchar* executable_directory =
+      executable_path == nullptr ? nullptr
+                                 : g_path_get_dirname(executable_path);
+  g_autofree gchar* bundled_icon_path =
+      executable_directory == nullptr
+          ? nullptr
+          : g_build_filename(executable_directory, "app_icon.png", nullptr);
+  g_autofree gchar* bundled_icon_theme_path =
+      executable_directory == nullptr
+          ? nullptr
+          : g_build_filename(executable_directory, "share", "icons", nullptr);
+
+  const gchar* icon_path = nullptr;
+  if (bundled_icon_path != nullptr &&
+      g_file_test(bundled_icon_path, G_FILE_TEST_IS_REGULAR)) {
+    icon_path = bundled_icon_path;
+  } else if (g_file_test(APP_ICON_PATH, G_FILE_TEST_IS_REGULAR)) {
+    icon_path = APP_ICON_PATH;
+  }
+
+  if (icon_path == nullptr) {
+    g_warning("Application icon was not found");
+    return;
+  }
+
+  if (bundled_icon_theme_path != nullptr &&
+      g_file_test(bundled_icon_theme_path, G_FILE_TEST_IS_DIR)) {
+    gtk_icon_theme_append_search_path(gtk_icon_theme_get_default(),
+                                      bundled_icon_theme_path);
+  }
+  gtk_window_set_icon_name(window, APPLICATION_ID);
+
+  g_autoptr(GError) error = nullptr;
+  if (!gtk_window_set_icon_from_file(window, icon_path, &error)) {
+    g_warning("Failed to load application icon '%s': %s", icon_path,
+              error == nullptr ? "unknown error" : error->message);
+  }
+}
 
 // Called when first Flutter frame received.
 static void first_frame_cb(MyApplication* self, FlView* view) {
@@ -27,6 +71,7 @@ static void my_application_activate(GApplication* application) {
   // for GNOME, KDE Plasma, and other Linux desktop environments.
   gtk_window_set_decorated(window, TRUE);
   gtk_window_set_title(window, "Devices and Printers Manager");
+  set_application_icon(window);
 
   gtk_window_set_default_size(window, 1280, 720);
 

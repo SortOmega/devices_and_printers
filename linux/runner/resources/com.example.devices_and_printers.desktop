@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Devices and Printers Manager
+Comment=Manage local and network devices
+Exec=devices_and_printers
+Icon=com.example.devices_and_printers
+Terminal=false
+Categories=Utility;
+StartupWMClass=com.example.devices_and_printers
