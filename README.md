@@ -11,6 +11,8 @@ from one place.
 The first implementation queries the Linux system and displays:
 
 - CUPS printers reported by `lpstat`.
+  Printers and plotters use CUPS `Description` as their visible name when it
+  contains text; otherwise they fall back to the CUPS queue name.
 - USB-connected devices reported by `lsusb`, classified as monitors,
   keyboards, mice, headsets, phones, cameras, storage, printers, plotters, or
   unknown devices. Generic and unsupported entries remain visible as unknown

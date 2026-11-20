@@ -138,3 +138,8 @@ badge for saved or active Bluetooth devices. Hide the Bluetooth badge only when
 the device is active through a non-Bluetooth connection. Group another
 transport with Bluetooth only through a conservative identity match, never by
 weak or coincidental name overlap.
+
+CUPS printers and plotters must use a non-empty CUPS `Description` as their
+visible name. Preserve the CUPS queue name in the stable ID and
+`additionalDetails.queueName`; fall back to the queue name only when the
+description is missing or blank.

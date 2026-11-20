@@ -23,6 +23,10 @@ class SystemDeviceRepository implements DeviceRepository {
       _commandRunner.run('pactl', ['list', 'sources']),
     ]);
 
+    final printerDescriptions = await _getPrinterDescriptions(
+      results[0].stdout,
+    );
+
     final bluetoothAddresses = _bluetoothAddresses(results[2].stdout);
     final bluetoothInfoResults = await Future.wait([
       for (final address in bluetoothAddresses)
@@ -33,7 +37,7 @@ class SystemDeviceRepository implements DeviceRepository {
         bluetoothAddresses[index]: bluetoothInfoResults[index].stdout,
     };
 
-    final printers = _parsePrinters(results[0].stdout);
+    final printers = _parsePrinters(results[0].stdout, printerDescriptions);
     final discoveredDevices = [
       ...printers,
       ..._parseUsbDevices(results[1].stdout, printers),
@@ -51,7 +55,43 @@ class SystemDeviceRepository implements DeviceRepository {
     return devices;
   }
 
-  List<Device> _parsePrinters(String output) {
+  Future<Map<String, String>> _getPrinterDescriptions(
+    String lpstatOutput,
+  ) async {
+    final queueNames = lpstatOutput
+        .split('\n')
+        .map(
+          (line) =>
+              RegExp(r'^printer\s+(\S+)').firstMatch(line.trim())?.group(1),
+        )
+        .whereType<String>()
+        .toSet();
+    if (queueNames.isEmpty) return const {};
+
+    final statusResults = await Future.wait([
+      for (final queueName in queueNames)
+        _commandRunner.run('lpstat', ['-l', '-p', queueName]),
+    ]);
+    final descriptions = <String, String>{};
+    for (var index = 0; index < queueNames.length; index++) {
+      final queueName = queueNames.elementAt(index);
+      final descriptionMatch = RegExp(
+        r'^\s*Description:\s*(.*)$',
+        multiLine: true,
+        caseSensitive: false,
+      ).firstMatch(statusResults[index].stdout);
+      final description = descriptionMatch?.group(1)?.trim();
+      if (description != null && description.isNotEmpty) {
+        descriptions[queueName] = description;
+      }
+    }
+    return descriptions;
+  }
+
+  List<Device> _parsePrinters(
+    String output,
+    Map<String, String> configuredDescriptions,
+  ) {
     final devices = <Device>[];
     final printerPattern = RegExp(r'^printer\s+(\S+)\s+(.+)$');
     final connectionPattern = RegExp(r'^device for\s+(\S+):\s+(\S+)$');
@@ -66,31 +106,43 @@ class SystemDeviceRepository implements DeviceRepository {
       }
 
       final printer = printerPattern.firstMatch(line.trim());
-      if (printer == null) {
-        continue;
+      if (printer != null) {
+        final printerName = printer.group(1)!;
+        printers[printerName] = printer.group(2)!;
       }
-
-      printers[printer.group(1)!] = printer.group(2)!;
     }
 
     for (final entry in printers.entries) {
-      final name = entry.key;
-      final description = entry.value;
-      final uri = connections[name];
+      final queueName = entry.key;
+      final statusDescription = entry.value;
+      final uri = connections[queueName];
+      final configuredDescription = configuredDescriptions[queueName]?.trim();
+      final name =
+          configuredDescription == null || configuredDescription.isEmpty
+          ? queueName
+          : configuredDescription;
       devices.add(
         Device(
-          id: 'printer:$name',
+          id: 'printer:$queueName',
           name: name,
-          type: name.toLowerCase().contains('plot')
+          type:
+              queueName.toLowerCase().contains('plot') ||
+                  name.toLowerCase().contains('plot')
               ? DeviceType.plotter
               : DeviceType.printer,
           connection: _printerConnection(uri),
-          status: description.contains('disabled')
+          status: statusDescription.contains('disabled')
               ? DeviceStatus.inactive
               : DeviceStatus.active,
-          details: uri ?? description,
+          details: uri ?? statusDescription,
           connectionPort: uri == null ? null : _connectionPort(uri),
           vendor: _vendorFromUri(uri),
+          additionalDetails: {
+            'queueName': queueName,
+            if (configuredDescription != null &&
+                configuredDescription.isNotEmpty)
+              'description': configuredDescription,
+          },
         ),
       );
     }

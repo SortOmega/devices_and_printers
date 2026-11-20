@@ -19,6 +19,68 @@ class FakeCommandRunner implements SystemCommandRunner {
 
 void main() {
   test(
+    'uses CUPS description as printer name and queue name as fallback',
+    () async {
+      final repository = SystemDeviceRepository(
+        commandRunner: FakeCommandRunner({
+          'lpstat': const CommandResult(
+            stdout:
+                'printer GuanDong is idle. enabled since today\n'
+                '  Device URI: socket://192.168.1.20:9100\n'
+                'printer PLOTTER-GCC-AR24 is idle. enabled since today\n'
+                '  Device URI: usb://GCC/AR-24?serial=0.0\n',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'lpstat -l -p GuanDong': const CommandResult(
+            stdout:
+                'printer GuanDong is idle.\n'
+                '\tDescription: GuangDong KY EjEt 1902\n',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'lpstat -l -p PLOTTER-GCC-AR24': const CommandResult(
+            stdout:
+                'printer PLOTTER-GCC-AR24 is idle.\n'
+                '\tDescription:    \n',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'lsusb': const CommandResult(stdout: '', stderr: '', exitCode: 0),
+          'bluetoothctl devices': const CommandResult(
+            stdout: '',
+            stderr: '',
+            exitCode: 0,
+          ),
+          'bluetoothctl devices Connected': const CommandResult(
+            stdout: '',
+            stderr: '',
+            exitCode: 0,
+          ),
+        }),
+      );
+
+      final devices = await repository.getDevices();
+
+      expect(devices, hasLength(2));
+      final printer = devices.singleWhere(
+        (device) => device.id == 'printer:GuanDong',
+      );
+      expect(printer.name, 'GuangDong KY EjEt 1902');
+      expect(printer.additionalDetails['queueName'], 'GuanDong');
+      expect(
+        printer.additionalDetails['description'],
+        'GuangDong KY EjEt 1902',
+      );
+
+      final plotter = devices.singleWhere(
+        (device) => device.id == 'printer:PLOTTER-GCC-AR24',
+      );
+      expect(plotter.name, 'PLOTTER-GCC-AR24');
+    },
+  );
+
+  test(
     'classifies Bluetooth devices by their real type and merges matching ports',
     () async {
       final repository = SystemDeviceRepository(
