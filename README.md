@@ -64,6 +64,9 @@ The first implementation queries the Linux system and displays:
   configured, with their device identity marked as active or unknown.
 - Refresh through the toolbar or pull-to-refresh gesture.
 - Light and dark themes that follow the operating-system preference.
+- Startup renders the cached local device list immediately, before system
+  commands finish; the cache is refreshed in the background and network
+  discovery starts independently after the first interface frame.
 - Single-instance behavior: launching the application again exits without
   creating a second window or application process.
 

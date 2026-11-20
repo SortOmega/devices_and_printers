@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import '../data_sources/system_command_runner.dart';
+import '../data_sources/device_cache.dart';
 import '../../domain/models/device.dart';
 import '../../domain/repositories/device_repository.dart';
 
 class SystemDeviceRepository implements DeviceRepository {
-  SystemDeviceRepository({SystemCommandRunner? commandRunner})
+  SystemDeviceRepository({SystemCommandRunner? commandRunner, this.cache})
     : _commandRunner = commandRunner ?? ProcessSystemCommandRunner();
 
   final SystemCommandRunner _commandRunner;
+  final DeviceCache? cache;
 
   @override
   Future<List<Device>> getDevices() async {
@@ -20,12 +24,16 @@ class SystemDeviceRepository implements DeviceRepository {
     ]);
 
     final printers = _parsePrinters(results[0].stdout);
-    return [
+    final devices = [
       ...printers,
       ..._parseUsbDevices(results[1].stdout, printers),
       ..._parseBluetoothDevices(results[2].stdout, results[3].stdout),
       ..._parseAudioDevices(results[4].stdout, results[5].stdout),
     ];
+    if (cache != null) {
+      unawaited(cache!.save(devices));
+    }
+    return devices;
   }
 
   List<Device> _parsePrinters(String output) {

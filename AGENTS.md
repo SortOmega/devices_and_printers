@@ -115,6 +115,11 @@ with a one-second refresh interval. Reconcile and notify listeners only when
 device data changes, and keep network discovery independent so a local change
 does not restart or discard an active network scan.
 
+Startup must render a persisted local-device cache immediately. Defer the
+first system/device refresh until after the first interface frame, preserve
+cached devices while fresh data is loading, and refresh the cache in the
+background without delaying UI completion.
+
 Network discovery must not classify a host as a printer solely because it has
 HTTP/HTTPS open. Require an actual printing service (`631`, `9100`, or `515`)
 for printer classification; classify the default gateway and strong router

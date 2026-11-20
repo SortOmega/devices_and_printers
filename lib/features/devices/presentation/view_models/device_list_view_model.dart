@@ -15,7 +15,8 @@ class DeviceListViewModel extends ChangeNotifier {
     this._networkScanner,
     this._networkSettings,
     this._localRefreshInterval,
-  ]) {
+    List<Device> initialDevices = const [],
+  ]) : devices = initialDevices {
     _networkSettings?.addListener(_networkSettingsChanged);
     _networkSettingsChanged();
   }
@@ -25,7 +26,7 @@ class DeviceListViewModel extends ChangeNotifier {
   final NetworkScanSettings? _networkSettings;
   final Duration? _localRefreshInterval;
   DeviceListStatus status = DeviceListStatus.initial;
-  List<Device> devices = const [];
+  List<Device> devices;
   String? errorMessage;
   String? networkErrorMessage;
   bool isScanningNetwork = false;
@@ -38,7 +39,9 @@ class DeviceListViewModel extends ChangeNotifier {
 
   Future<void> loadDevices() async {
     cancelNetworkScan();
-    status = DeviceListStatus.loading;
+    status = devices.isEmpty
+        ? DeviceListStatus.loading
+        : DeviceListStatus.loaded;
     errorMessage = null;
     networkErrorMessage = null;
     notifyListeners();
@@ -189,6 +192,7 @@ class DeviceListViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _automaticScanTimer?.cancel();
+    _localRefreshTimer?.cancel();
     _networkSettings?.removeListener(_networkSettingsChanged);
     super.dispose();
   }

@@ -16,7 +16,57 @@ class FakeDeviceRepository implements DeviceRepository {
   Future<List<Device>> getDevices() async => devices;
 }
 
+class CompletableDeviceRepository implements DeviceRepository {
+  CompletableDeviceRepository(this.devices);
+
+  final Future<List<Device>> devices;
+
+  @override
+  Future<List<Device>> getDevices() => devices;
+}
+
 void main() {
+  test(
+    'shows cached devices while a fresh local load is in progress',
+    () async {
+      const cachedDevices = [
+        Device(
+          id: 'usb:cached',
+          name: 'Cached keyboard',
+          type: DeviceType.keyboard,
+          connection: DeviceConnection.usb,
+          status: DeviceStatus.active,
+        ),
+      ];
+      final freshLoad = Completer<List<Device>>();
+      final viewModel = DeviceListViewModel(
+        CompletableDeviceRepository(freshLoad.future),
+        null,
+        null,
+        null,
+        cachedDevices,
+      );
+
+      final loading = viewModel.loadDevices();
+
+      expect(viewModel.status, DeviceListStatus.loaded);
+      expect(viewModel.devices, cachedDevices);
+
+      freshLoad.complete(const [
+        Device(
+          id: 'usb:fresh',
+          name: 'Fresh keyboard',
+          type: DeviceType.keyboard,
+          connection: DeviceConnection.usb,
+          status: DeviceStatus.active,
+        ),
+      ]);
+      await loading;
+
+      expect(viewModel.devices.single.id, 'usb:fresh');
+    },
+  );
+
   test('loads devices and groups them by type', () async {
     final viewModel = DeviceListViewModel(
       FakeDeviceRepository([
