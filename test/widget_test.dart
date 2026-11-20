@@ -113,6 +113,27 @@ void main() {
     expect(find.byIcon(Icons.lan), findsOneWidget);
   });
 
+  testWidgets('primary navigation renders a bottom shadow', (
+    WidgetTester tester,
+  ) async {
+    final viewModel = DeviceListViewModel(FakeDeviceRepository())
+      ..loadDevices();
+
+    await tester.pumpWidget(
+      localizedApp(DeviceListScreen(viewModel: viewModel)),
+    );
+    await tester.pumpAndSettle();
+
+    final elevatedNavigation = find.byWidgetPredicate(
+      (widget) =>
+          widget is Material &&
+          widget.elevation == 4 &&
+          widget.shadowColor != null,
+    );
+
+    expect(elevatedNavigation, findsOneWidget);
+  });
+
   testWidgets('shows network scan progress in the footer', (
     WidgetTester tester,
   ) async {

@@ -15,43 +15,48 @@ class PrimaryNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      elevation: 1,
-      child: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Center(
-            child: SegmentedButton<String>(
-              style: const ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                padding: WidgetStatePropertyAll(
-                  EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: colorScheme.surface,
+        elevation: 4,
+        shadowColor: colorScheme.shadow,
+        child: SafeArea(
+          bottom: false,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Center(
+              child: SegmentedButton<String>(
+                style: const ButtonStyle(
+                  visualDensity: VisualDensity.compact,
+                  padding: WidgetStatePropertyAll(
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  ),
                 ),
+                segments: [
+                  ButtonSegment(
+                    value: 'devices',
+                    label: Text(l10n.viewDevices),
+                    icon: const Icon(Icons.devices_other, size: 18),
+                  ),
+                  ButtonSegment(
+                    value: 'about',
+                    label: Text(l10n.about),
+                    icon: const Icon(Icons.info_outline, size: 18),
+                  ),
+                  ButtonSegment(
+                    value: 'settings',
+                    label: Text(l10n.settings),
+                    icon: const Icon(Icons.settings_outlined, size: 18),
+                  ),
+                ],
+                selected: {activePage},
+                onSelectionChanged: (selection) {
+                  onPageChanged(selection.first);
+                },
               ),
-              segments: [
-                ButtonSegment(
-                  value: 'devices',
-                  label: Text(l10n.viewDevices),
-                  icon: const Icon(Icons.devices_other, size: 18),
-                ),
-                ButtonSegment(
-                  value: 'about',
-                  label: Text(l10n.about),
-                  icon: const Icon(Icons.info_outline, size: 18),
-                ),
-                ButtonSegment(
-                  value: 'settings',
-                  label: Text(l10n.settings),
-                  icon: const Icon(Icons.settings_outlined, size: 18),
-                ),
-              ],
-              selected: {activePage},
-              onSelectionChanged: (selection) {
-                onPageChanged(selection.first);
-              },
             ),
           ),
         ),
