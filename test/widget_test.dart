@@ -73,44 +73,57 @@ Widget localizedApp(Widget home) {
 }
 
 void main() {
-  testWidgets('shows a Bluetooth badge only for active Bluetooth devices', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      localizedApp(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DeviceCard(
-              device: const Device(
-                id: 'bluetooth:connected',
-                name: 'Connected headset',
-                type: DeviceType.headset,
-                connection: DeviceConnection.bluetooth,
-                status: DeviceStatus.active,
+  testWidgets(
+    'shows a Bluetooth badge for saved and active Bluetooth devices',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        localizedApp(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DeviceCard(
+                device: const Device(
+                  id: 'bluetooth:connected',
+                  name: 'Connected headset',
+                  type: DeviceType.headset,
+                  connection: DeviceConnection.bluetooth,
+                  status: DeviceStatus.active,
+                ),
+                isSelected: false,
+                onSelected: (_) {},
               ),
-              isSelected: false,
-              onSelected: (_) {},
-            ),
-            const SizedBox(width: 12),
-            DeviceCard(
-              device: const Device(
-                id: 'bluetooth:disconnected',
-                name: 'Disconnected headset',
-                type: DeviceType.headset,
-                connection: DeviceConnection.bluetooth,
-                status: DeviceStatus.disconnected,
+              const SizedBox(width: 12),
+              DeviceCard(
+                device: const Device(
+                  id: 'bluetooth:disconnected',
+                  name: 'Disconnected headset',
+                  type: DeviceType.headset,
+                  connection: DeviceConnection.bluetooth,
+                  status: DeviceStatus.disconnected,
+                ),
+                isSelected: false,
+                onSelected: (_) {},
               ),
-              isSelected: false,
-              onSelected: (_) {},
-            ),
-          ],
+              const SizedBox(width: 12),
+              DeviceCard(
+                device: const Device(
+                  id: 'usb:active',
+                  name: 'USB keyboard',
+                  type: DeviceType.keyboard,
+                  connection: DeviceConnection.usb,
+                  status: DeviceStatus.active,
+                ),
+                isSelected: false,
+                onSelected: (_) {},
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
-    expect(find.byIcon(Icons.bluetooth), findsOneWidget);
-  });
+      expect(find.byIcon(Icons.bluetooth), findsNWidgets(2));
+    },
+  );
 
   testWidgets('shows queried devices grouped by type', (
     WidgetTester tester,

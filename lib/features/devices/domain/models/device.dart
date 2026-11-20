@@ -75,12 +75,9 @@ class Device {
   bool get isActive => status == DeviceStatus.active;
 
   bool get hasBluetoothConnection =>
-      (connection == DeviceConnection.bluetooth &&
-          status == DeviceStatus.active) ||
+      connection == DeviceConnection.bluetooth ||
       components.any(
-        (component) =>
-            component.connection == DeviceConnection.bluetooth &&
-            component.status == DeviceStatus.active,
+        (component) => component.connection == DeviceConnection.bluetooth,
       );
 
   Device copyWith({List<DeviceComponent>? components}) {

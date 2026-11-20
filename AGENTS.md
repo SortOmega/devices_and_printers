@@ -134,6 +134,7 @@ list.
 
 Bluetooth devices must use their real type icon, such as headset, microphone,
 speaker, mouse, keyboard, phone, camera, or game console. Show a Bluetooth
-badge only for an active Bluetooth connection. Group another transport with
-Bluetooth only through a conservative identity match, never by weak or
-coincidental name overlap.
+badge for saved or active Bluetooth devices. Hide the Bluetooth badge only when
+the device is active through a non-Bluetooth connection. Group another
+transport with Bluetooth only through a conservative identity match, never by
+weak or coincidental name overlap.
