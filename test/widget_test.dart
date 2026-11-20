@@ -9,6 +9,7 @@ import 'package:devices_and_printers/features/devices/data/data_sources/network_
 import 'package:devices_and_printers/features/devices/domain/repositories/device_repository.dart';
 import 'package:devices_and_printers/features/devices/presentation/view_models/device_list_view_model.dart';
 import 'package:devices_and_printers/features/devices/presentation/widgets/windows/devices_window.dart';
+import 'package:devices_and_printers/features/devices/presentation/widgets/windows/about_window.dart';
 import 'package:devices_and_printers/features/devices/presentation/widgets/components/device_card.dart';
 import 'package:devices_and_printers/l10n/generated/app_localizations.dart';
 
@@ -73,6 +74,38 @@ Widget localizedApp(Widget home) {
 }
 
 void main() {
+  testWidgets('shows project credits and license links in About', (
+    WidgetTester tester,
+  ) async {
+    Uri? openedUri;
+
+    await tester.pumpWidget(
+      localizedApp(
+        AboutPage(
+          onOpenUrl: (uri) async {
+            openedUri = uri;
+            return true;
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Developed by SortOmega'), findsOneWidget);
+    expect(find.text('Project repository'), findsOneWidget);
+    expect(find.text('Open repository'), findsOneWidget);
+    expect(find.text('GNU General Public License v2.0'), findsOneWidget);
+    expect(find.text('View GPL-2.0 license'), findsOneWidget);
+
+    await tester.tap(find.text('View GPL-2.0 license'));
+    await tester.pump();
+
+    expect(
+      openedUri?.toString(),
+      'https://github.com/SortOmega/devices_and_printers/blob/main/LICENSE',
+    );
+  });
+
   testWidgets(
     'shows a Bluetooth badge for saved and active Bluetooth devices',
     (WidgetTester tester) async {

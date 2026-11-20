@@ -96,6 +96,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'A centralized Linux view for discovering and managing connected devices and printers.';
 
   @override
+  String get aboutDevelopedBy => 'Developed by SortOmega';
+
+  @override
+  String get aboutProjectRepository => 'Project repository';
+
+  @override
+  String get aboutViewRepository => 'Open repository';
+
+  @override
+  String get aboutLicense => 'License';
+
+  @override
+  String get aboutLicenseGpl2 => 'GNU General Public License v2.0';
+
+  @override
+  String get aboutViewLicense => 'View GPL-2.0 license';
+
+  @override
   String get language => 'Language';
 
   @override

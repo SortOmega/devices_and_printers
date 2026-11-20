@@ -43,6 +43,12 @@
     }
   },
   "aboutDescription": "A centralized Linux view for discovering and managing connected devices and printers.",
+  "aboutDevelopedBy": "Developed by SortOmega",
+  "aboutProjectRepository": "Project repository",
+  "aboutViewRepository": "Open repository",
+  "aboutLicense": "License",
+  "aboutLicenseGpl2": "GNU General Public License v2.0",
+  "aboutViewLicense": "View GPL-2.0 license",
   "language": "Language",
   "settings": "Settings",
   "appearance": "Appearance",

@@ -72,6 +72,8 @@ The first implementation queries the Linux system and displays:
   configured, with their device identity marked as active or unknown.
 - Refresh through the toolbar or pull-to-refresh gesture.
 - Light and dark themes that follow the operating-system preference.
+- The About page credits SortOmega, links to the project repository, and
+  identifies the GNU GPL v2.0 license.
 - Startup renders the cached local device list immediately, before system
   commands finish; the cache is refreshed in the background and network
   discovery starts independently after the first interface frame.

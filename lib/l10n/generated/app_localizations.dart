@@ -254,6 +254,42 @@ abstract class AppLocalizations {
   /// **'A centralized Linux view for discovering and managing connected devices and printers.'**
   String get aboutDescription;
 
+  /// No description provided for @aboutDevelopedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Developed by SortOmega'**
+  String get aboutDevelopedBy;
+
+  /// No description provided for @aboutProjectRepository.
+  ///
+  /// In en, this message translates to:
+  /// **'Project repository'**
+  String get aboutProjectRepository;
+
+  /// No description provided for @aboutViewRepository.
+  ///
+  /// In en, this message translates to:
+  /// **'Open repository'**
+  String get aboutViewRepository;
+
+  /// No description provided for @aboutLicense.
+  ///
+  /// In en, this message translates to:
+  /// **'License'**
+  String get aboutLicense;
+
+  /// No description provided for @aboutLicenseGpl2.
+  ///
+  /// In en, this message translates to:
+  /// **'GNU General Public License v2.0'**
+  String get aboutLicenseGpl2;
+
+  /// No description provided for @aboutViewLicense.
+  ///
+  /// In en, this message translates to:
+  /// **'View GPL-2.0 license'**
+  String get aboutViewLicense;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:
